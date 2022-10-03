@@ -13,6 +13,7 @@ export function ProductPage({ navigation, route }) {
     const [isLiked, setIsLiked] = useState(true);
     const [item, setItem] = useState();
     const [itemImg, setItemImg] = useState([]);
+    const [isOwner, setIsOwner] = useState(false);
     const [owner, setOwner] = useState({
         photo: "https://i.pinimg.com/736x/b1/16/0f/b1160fdd10b71b095c19366845fd6b3e.jpg",
         name: "สมชาย รักดี",
@@ -40,6 +41,10 @@ export function ProductPage({ navigation, route }) {
     }
     const getPost = async () => {
         const data = await API.getPostById(postId);
+        const currentUser = await API.getUserProfile();
+        if (data.equipment.user.userId === currentUser.userId) {
+            setIsOwner(true);
+        }
         setItem(data);
         let temp = [];
         data?.equipment?.itemImg.forEach(img => {
@@ -48,6 +53,7 @@ export function ProductPage({ navigation, route }) {
         setItemImg(temp);
         await liked(data);
     }
+
     useEffect(() => {
         navigation.setOptions({
             title: '',
@@ -73,9 +79,15 @@ export function ProductPage({ navigation, route }) {
                                 alignItems: "center",
                                 alignSelf: "center",
                                 justifyContent: "center",
-                                paddingVertical: 10
+                                paddingVertical: 10,
                             }}
-                            ImageComponentStyle={{ padding: 50 }}
+                            ImageComponentStyle={{
+                                alignSelf: 'center',
+                                width: '100%',
+                                height: '100%',
+                                resizeMode: 'contain',
+                            }}
+                            resizeMode="contain"
                         />
                         {/* <Image
                             style={styles.postImage}
@@ -149,6 +161,7 @@ export function ProductPage({ navigation, route }) {
                     </View>
                 </View>
             </ScrollView>
+
             <View style={[styles.row,
             {
                 backgroundColor: 'white',
@@ -172,30 +185,32 @@ export function ProductPage({ navigation, route }) {
                     <Text>{item?.equipment.user?.email}</Text>
                 </View>
                 <View>
-                    <TouchableOpacity
-                        onPress={() => contactBtn()}
-                    >
-                        <View style={{
-                            width: 80,
-                            height: 40,
-                            backgroundColor: "#FF6280",
-                            borderRadius: 30,
-                            justifyContent: 'center',
+                    {!isOwner &&
+                        <TouchableOpacity
+                            onPress={() => contactBtn()}
+                        >
+                            <View style={{
+                                width: 80,
+                                height: 40,
+                                backgroundColor: "#FF6280",
+                                borderRadius: 30,
+                                justifyContent: 'center',
 
-                        }}>
-                            <Text
-                                style={{
-                                    textAlign: "center",
-                                    margin: 'auto',
-                                    color: 'white',
-                                    fontSize: 18,
-                                    fontWeight: "bold"
-                                }}
-                            >
-                                ติดต่อ
-                            </Text>
-                        </View>
-                    </TouchableOpacity>
+                            }}>
+                                <Text
+                                    style={{
+                                        textAlign: "center",
+                                        margin: 'auto',
+                                        color: 'white',
+                                        fontSize: 18,
+                                        fontWeight: "bold"
+                                    }}
+                                >
+                                    ติดต่อ
+                                </Text>
+                            </View>
+                        </TouchableOpacity>
+                    }
                 </View>
             </View>
         </View>

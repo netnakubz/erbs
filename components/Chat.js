@@ -11,7 +11,7 @@ import { Card } from 'react-native-paper';
 
 
 export default function Chat({ props, navigation, user }) {
-    const name = props.userOne.userId === user.userId ?  `${props.userTwo.name} ${props.userTwo.surname}`:`${props.userOne.name} ${props.userOne.surname}`;
+    const name = props.userOne.userId === user.userId ? props.userTwo : props.userOne;
     const onPressChat = (roomId) => {
         navigation.navigate('DirectMessage', {
             roomId: roomId,
@@ -19,8 +19,8 @@ export default function Chat({ props, navigation, user }) {
             user: user
         });
     };
-    useEffect(()=>{
-    },[]);
+    useEffect(() => {
+    }, []);
     return (
         <TouchableOpacity
             onPress={() => {
@@ -38,7 +38,7 @@ export default function Chat({ props, navigation, user }) {
                     </View>
                     <View style={{ flex: 1 }}>
                         <View>
-                            <Text style={styles.chatName}>{name}</Text>
+                            <Text style={styles.chatName}>{name.name} {name.surname}</Text>
                         </View>
                     </View>
                 </View>

@@ -1,19 +1,18 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     StyleSheet,
     SafeAreaView,
 } from 'react-native';
 import Swiper from 'react-native-swiper'
-import {Dimensions} from 'react-native';
-import {createNativeStackNavigator} from "@react-navigation/native-stack"
-import {FindToBorrowPage} from "./FindToBorrowPage";
-import {FindToLendPage} from './FindToLendPage';
-import {FloatingBtn} from '../components/FloatingBtn';
+import { Dimensions } from 'react-native';
+import { createNativeStackNavigator } from "@react-navigation/native-stack"
+import { FindToBorrowPage } from "./FindToBorrowPage";
+import { FindToLendPage } from './FindToLendPage';
+import { FloatingBtn } from '../components/FloatingBtn';
 
-const RenderHomeScreen = ({isHomePage, setHomeFalse}) => {
+const RenderHomeScreen = ({ isHomePage, setHomeFalse, isReady }) => {
     const [content, setContent] = useState('All');
-
     return (
         <View
             style={styles.sliderBox}
@@ -26,25 +25,25 @@ const RenderHomeScreen = ({isHomePage, setHomeFalse}) => {
                     scrollEnabled={true}
                     nestedScrollEnabled={true}
                     removeClippedSubviews={false}
-                    containerStyle={{width: Dimensions.get('window').width, height: Dimensions.get('window').height}}
+                    containerStyle={{ width: Dimensions.get('window').width, height: Dimensions.get('window').height }}
                 >
                     <FindToBorrowPage content={content} setContent={setContent} isHomePage={isHomePage}
-                                      setHomePage={setHomeFalse}/>
-                    <FindToLendPage/>
+                        setHomePage={setHomeFalse} isReady={isReady} />
+                    <FindToLendPage isReady={isReady} />
                 </Swiper>
-                <FloatingBtn/>
+                <FloatingBtn />
             </SafeAreaView>
         </View>
 
     );
 }
 const HomeStack = createNativeStackNavigator();
-export const HomeScreen = ({isHomePage, setHomeFalse}) => {
+export const HomeScreen = ({ isHomePage, setHomeFalse, isReady }) => {
     return (
-        <HomeStack.Navigator screenOptions={{headerShown: false}}>
+        <HomeStack.Navigator screenOptions={{ headerShown: false }}>
             <HomeStack.Screen
-                children={props => <RenderHomeScreen {...props} isHomePage={isHomePage} setHomeFalse={setHomeFalse}/>}
-                name="RenderHomeScreen"/>
+                children={props => <RenderHomeScreen {...props} isHomePage={isHomePage} setHomeFalse={setHomeFalse} isReady={isReady} />}
+                name="RenderHomeScreen" />
         </HomeStack.Navigator>
     );
 };

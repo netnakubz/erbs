@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Image,
   View,
@@ -54,92 +54,184 @@ import { FirstPage } from './pages/FirstPage';
 import { SaveReceipt } from './pages/SaveReceipt';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SignUp } from './pages/SignUp';
-const MusicRoute = () => <Text style={{ color: "green" }}>Music</Text>;
-
-const AlbumsRoute = () => <Text style={{ color: "green" }}>Albums</Text>;
-
-const RecentsRoute = () => <Text style={{ color: "green" }}>Recents</Text>;
 const BottomNav = () => {
   const [homePage, setHomePage] = useState(true);
   const navigation = useNavigation();
-  const checktoken = async () => {
+  const [isReady, setIsReady] = useState(false);
+  const checkToken = async () => {
     let token = await AsyncStorage.getItem("token");
-    // await AsyncStorage.clear("token")
+    // await AsyncStorage.clear("token");
+    // await AsyncStorage.clear("refreshToken");
     if (token === null) {
-      navigation.navigate("firstPage");
+      navigation.navigate("firstPage", {
+        ready: (e) => setIsReady(e)
+      });
+    } else {
+      setIsReady(true);
     }
   }
+
   useEffect(() => {
-    checktoken();
+    checkToken()
   }, []);
   return (
-    <Tab.Navigator
-      initialRouteName='Home'
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
-          if (route.name === 'Home') {
-            iconName = 'home-outline';
-          } else if (route.name === 'Like') {
-            iconName = 'heart-outline';
-          } else if (route.name === 'PersonalScreen') {
-            iconName = 'person-outline';
-          } else if (route.name === 'Chat') {
-            iconName = 'chatbubbles-outline';
-          }
-          if (focused) {
-            color = '#FF6280';
-          }
-          // You can return any component that you like here!
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
-        tabBarShowLabel: false,
-        tabBarStyle: [
-          {
-            position: "absolute", bottom: 0, left: 0, right: 0,
-            display: 'flex',
-          },
-          null,
-        ],
-      })}>
-      <Tab.Screen name="Home" options={{ headerShown: false }}
-        listeners={() => ({
-          tabPress: (e) => {
-            if (e.type === "tabPress") {
-              setHomePage(true);
-            }
-          }
-        })}
-        children={props => <HomeScreen isHomePage={homePage} setHomeFalse={setHomePage}  {...props} />}
-      />
-      <Tab.Screen name="Like" options={{ title: "สิ่งที่ฉันถูกใจ" }} component={LikeScreen} />
-      <Tab.Screen name="Chat" options={{ headerShown: false }} component={ListChat} />
-      <Tab.Screen name="PersonalScreen" component={PersonalScreen} />
-    </Tab.Navigator>
+    <View style={{ flex: 1 }}>
+      {isReady &&
+        <Tab.Navigator
+          initialRouteName='Home'
+          screenOptions={({ route }) => ({
+            tabBarIcon: ({ focused, color, size }) => {
+              let iconName;
+              if (route.name === 'Home') {
+                iconName = 'home-outline';
+              } else if (route.name === 'Like') {
+                iconName = 'heart-outline';
+              } else if (route.name === 'PersonalScreen') {
+                iconName = 'person-outline';
+              } else if (route.name === 'Chat') {
+                iconName = 'chatbubbles-outline';
+              }
+              if (focused) {
+                color = '#FF6280';
+              }
+              // You can return any component that you like here!
+              return <Ionicons name={iconName} size={size} color={color} />;
+            },
+            tabBarShowLabel: false,
+            tabBarStyle: [
+              {
+                position: "absolute", bottom: 0, left: 0, right: 0,
+                display: 'flex',
+              },
+              null,
+            ],
+          })}>
+          <Tab.Screen name="Home" options={{ headerShown: false }}
+            listeners={() => ({
+              tabPress: (e) => {
+                if (e.type === "tabPress") {
+                  setHomePage(true);
+                }
+              }
+            })}
+            children={props => <HomeScreen isHomePage={homePage} setHomeFalse={setHomePage}  {...props} />}
+          />
+          <Tab.Screen name="Like" options={{ title: "สิ่งที่ฉันถูกใจ" }} component={LikeScreen} />
+          <Tab.Screen name="Chat" options={{ headerShown: false }} component={ListChat} />
+          <Tab.Screen name="PersonalScreen" component={PersonalScreen} />
+        </Tab.Navigator>
+      }
+    </View>
   );
 }
 
-
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
+import SockJS from 'sockjs-client';
+import Stomp from 'webstomp-client';
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
 export default function App() {
   LogBox.ignoreAllLogs()
-  const [login, isLogin] = useState(false);
+  const SOCKET_URL = `${API.domain}/ws`;
+  var socket = '';
+  var stompClient = '';
+  var connected = false;
+  socket = new SockJS(SOCKET_URL);
+  const [userProfile, setUserProfile] = useState([]);
+  const getUserProfile = async () => {
+    const data = await API.getUserProfile();
+    setUserProfile(data);
+  }
+  const connectSocket = async () => {
+    const data = await API.getUserProfile();
+    stompClient = Stomp.over(socket);
+    stompClient.connect(
+      {},
+      (frame) => {
+        connected = true;
 
+        stompClient.subscribe(`/notification-${data.userId}`, async (val) => {
+          console.log(val);
+          await schedulePushNotification(val);
+        })
+      },
+      (error) => {
+        console.log(error);
+        connected = false;
+      }
+    );
+  }
+  const [expoPushToken, setExpoPushToken] = useState('');
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  const responseListener = useRef();
+  async function registerForPushNotificationsAsync() {
+    let token;
+    if (Platform.OS === 'android') {
+      await Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      });
+    }
+
+    if (Device.isDevice) {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== 'granted') {
+        alert('Failed to get push token for push notification!');
+        return;
+      }
+      token = (await Notifications.getExpoPushTokenAsync()).data;
+      console.log(token);
+    } else {
+      alert('Must use physical device for Push Notifications');
+    }
+
+    return token;
+  }
+  async function schedulePushNotification(message) {
+    let string = JSON.parse(message.body);
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: string.sender,
+        body: string.message,
+        data: { data: 'goes here' },
+        sound: true
+      },
+      trigger: { seconds: 2 },
+    });
+  }
   useEffect(() => {
-    // AsyncStorage.clear();
-    // API.auth();
-  }, []);
-  const isDarkMode = useColorScheme() === 'dark';
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+    registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      setNotification(notification);
+    });
 
-  // React.useEffect(() => {
-  //   const getPermission = async () => {
-  //     let result = await ImagePicker.getCameraPermissionsAsync();
-  //     console.log(result);
-  //   }
-  //   getPermission();
-  // }, []);
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log(response);
+    });
+
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener.current);
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
+  }, []);
+  useEffect(() => {
+    getUserProfile();
+    connectSocket();
+  }, []);
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <NavigationContainer>
@@ -159,52 +251,11 @@ export default function App() {
           <Stack.Screen component={EquipmentSettings} name="EquipmentSettings" options={{ title: "ตั้งค่าอุปกรณ์" }} />
           <Stack.Screen component={SaveReceipt} name="SaveReceipt" />
           <Stack.Screen component={Receipt} name="ใบเสร็จ" />
-          <Stack.Screen component={SignUp} options={{ headerShown: false }} name="SignUp" />
           <Stack.Screen component={FirstPage} name="firstPage" options={{ headerShown: false }} />
+          <Stack.Screen component={SignUp} options={{ headerShown: false }} name="SignUp" />
+
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
   );
 }
-const styles = StyleSheet.create({
-  paragraph: {
-    margin: 24,
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  row: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  col: {
-    flexDirection: 'column',
-    flexWrap: 'wrap',
-  },
-  card: {
-    padding: 10,
-  },
-  chatName: {
-    fontWeight: 'bold',
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  container: {
-    marginTop: 10,
-    flex: 1,
-  }
-});

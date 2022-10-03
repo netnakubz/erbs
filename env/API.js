@@ -5,7 +5,7 @@ import { DeviceEventEmitter } from "react-native";
 axios.interceptors.response.use(
     undefined,
     async (error) => {
-        console.log("errrorrrrrrrrrrr")
+        console.log(error.response.status)
         const originalConfig = error.config;
         if (error.response) {
             if (error.response.status === 401) {
@@ -21,15 +21,9 @@ axios.interceptors.response.use(
                 const refreshToken = await AsyncStorage.getItem("refreshToken");
                 let authState = await AppAuth.refreshAsync(config, refreshToken);
                 AsyncStorage.setItem("token", authState.idToken);
-                return _authorizing.then(() => axios.request(originalConfig));
-            }
-
-            if (error.response.status === ANOTHER_STATUS_CODE) {
-                // Do something 
-                return Promise.reject(error.response.data);
+                return axios.request(originalConfig);
             }
         }
-
         return Promise.reject(error);
     }
 )
@@ -304,7 +298,7 @@ let API = {
     },
     auth: async () => {
         let token = await API.getToken("auth");
-        const data = await axios.put(`${API.domain}/api/v1/isAuthed`, {},
+        const data = await axios.get(`${API.domain}/api/v1/isAuthed`,
             {
                 headers:
                     { Authorization: `Bearer ${token}` }
@@ -314,7 +308,7 @@ let API = {
     },
     addOrUpdateUser: async (user) => {
         let token = await API.getToken("auth");
-        const data = await axios.get(`${API.domain}/api/v1/updateUserInformation`,
+        const data = await axios.post(`${API.domain}/api/v1/updateUserInformation`,
             user
             , {
                 headers:

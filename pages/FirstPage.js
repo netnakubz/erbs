@@ -4,7 +4,8 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import * as Google from "expo-google-app-auth";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import API from '../env/API';
-export const FirstPage = ({ navigation }) => {
+export const FirstPage = ({ route, navigation }) => {
+    const { ready } = route.params;
     const signInWithGoogleAsync = async () => {
         try {
             const result = await Google.logInAsync({
@@ -12,28 +13,27 @@ export const FirstPage = ({ navigation }) => {
                 scopes: ['profile', 'email'],
                 responseType: "code",
                 shouldAutoExchangeCode: false,
-                expire_in:36000,
+                expire_in: 36000,
                 extraParams: {
                     access_type: "offline"
                 },
             });
-            
             if (result.type === 'success') {
-                console.log(result);
                 try {
                     await AsyncStorage.setItem("token", result.idToken);
-                }catch(e){
+                    await AsyncStorage.setItem("refreshToken", result.refreshToken)
+                } catch (e) {
                     console.log(e);
                 }
-                console.log(result.refreshToken);
                 const isExist = await API.auth();
                 console.log(isExist);
-                if (!isExist) {
+                if (!false) {
                     navigation.navigate("SignUp", {
                         userInfo: result.user
                     });
                 } else {
-                    navigation.navigate("BottomNav");
+                    ready(true)
+                    navigation.goBack();
                 }
             }
         } catch (e) {

@@ -19,7 +19,6 @@ export const FindToBorrowPage = ({ content, setContent, isHomePage, setHomePage 
     const [post, setPost] = useState();
     const [value, setValue] = useState();
     const [selectedType, setSelectedType] = useState('ทั้งหมด');
-
     const flatListRef = useRef();
     useEffect(() => {
         if (post) {

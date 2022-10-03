@@ -1,14 +1,95 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { View, StyleSheet, ScrollView, Image, Button, Text, TouchableOpacity, Dimensions } from "react-native";
 import Chat from "../components/Chat";
 import axios from "axios";
 import { Card } from 'react-native-paper';
 const screenWidth = Dimensions.get('window').width;
-
 import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import API from "../env/API";
+import SockJS from 'sockjs-client';
+import Stomp from 'webstomp-client';
+
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
+
+Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: false,
+        shouldSetBadge: false,
+    }),
+});
 export default function Room({ navigation }) {
+
+    //Notification
+    const [expoPushToken, setExpoPushToken] = useState('');
+    const [notification, setNotification] = useState(false);
+    const notificationListener = useRef();
+    const responseListener = useRef();
+    async function registerForPushNotificationsAsync() {
+        let token;
+        if (Platform.OS === 'android') {
+            await Notifications.setNotificationChannelAsync('default', {
+                name: 'default',
+                importance: Notifications.AndroidImportance.MAX,
+                vibrationPattern: [0, 250, 250, 250],
+                lightColor: '#FF231F7C',
+            });
+        }
+
+        if (Device.isDevice) {
+            const { status: existingStatus } = await Notifications.getPermissionsAsync();
+            let finalStatus = existingStatus;
+            if (existingStatus !== 'granted') {
+                const { status } = await Notifications.requestPermissionsAsync();
+                finalStatus = status;
+            }
+            if (finalStatus !== 'granted') {
+                alert('Failed to get push token for push notification!');
+                return;
+            }
+            token = (await Notifications.getExpoPushTokenAsync()).data;
+            console.log(token);
+        } else {
+            alert('Must use physical device for Push Notifications');
+        }
+
+        return token;
+    }
+    async function schedulePushNotification(message) {
+        console.log(message);
+        let string = JSON.parse(message.body);
+        await Notifications.scheduleNotificationAsync({
+            content: {
+                title: "ข้อความ",
+                body: string,
+                data: { data: 'goes here' },
+            },
+            trigger: { seconds: 2 },
+        });
+    }
+    useEffect(() => {
+        registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+        notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+            setNotification(notification);
+        });
+
+        responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+            console.log(response);
+        });
+
+        return () => {
+            Notifications.removeNotificationSubscription(notificationListener.current);
+            Notifications.removeNotificationSubscription(responseListener.current);
+        };
+    }, []);
+
+    const SOCKET_URL = `${API.domain}/ws`;
+    var socket = '';
+    var stompClient = '';
+    var connected = false;
+    socket = new SockJS(SOCKET_URL);
     const [rooms, setRoom] = useState([]);
     const [userProfile, setUserProfile] = useState([]);
     const deleteBtn = () => {
@@ -88,9 +169,28 @@ export default function Room({ navigation }) {
         const data = await API.getUserProfile();
         setUserProfile(data);
     }
+    const connectSocket = async () => {
+        const data = await API.getUserProfile();
+        stompClient = Stomp.over(socket);
+        stompClient.connect(
+            {},
+            (frame) => {
+                connected = true;
+                stompClient.subscribe(`/roomList/user-${data.userId}`, async (val) => {
+                    const newRoom = JSON.parse(val.body);
+                    setRoom(newRoom);
+                });
+            },
+            (error) => {
+                console.log(error);
+                connected = false;
+            }
+        );
+    }
     useEffect(() => {
         getListChat();
         getUserProfile();
+        connectSocket();
     }, []);
     return (
         <ScrollView showsVerticalScrollIndicator={false}>

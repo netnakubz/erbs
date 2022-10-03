@@ -14,6 +14,7 @@ export default function DirectMessage({ route, navigation }) {
   const [isInputPressed, setIsInputPressed] = useState(false);
   const [contractModalShow, setContractModalShow] = useState(false);
   const [newContract, setNewContract] = useState();
+  const [myProfile, setMyProfile] = useState({});
   const { destination, roomId, user, data } = route.params;
   const SOCKET_URL = `${API.domain}/ws`;
   var socket = '';
@@ -54,14 +55,14 @@ export default function DirectMessage({ route, navigation }) {
               title: '😋 สนใจสินค้า ',
               text: '😋 สนใจ ' + data.equipment.name,
               user: {
-                _id: user
+                _id: user.userId ? user.userId : user
               }
             },
             {
               title: '👋 ต้องกาติดต่อเพิ่มเติม',
               text: '👋 ต้องกาติดต่อเพิ่มเติม',
               user: {
-                _id: user
+                _id: user.userId ? user.userId : user
               }
             },
           ],
@@ -129,10 +130,15 @@ export default function DirectMessage({ route, navigation }) {
     sendContract()
   }, [newContract]);
 
-  useEffect(() => {
-    getChat();
 
-    navigation.setOptions({ title: destination });
+  const getMyProfile = async () => {
+    const data = await API.getUserProfile();
+    setMyProfile(data);
+  }
+  useEffect(() => {
+    getMyProfile();
+    getChat();
+    navigation.setOptions({ title: `${destination.name} ${destination.surname}` });
     stompClient = Stomp.over(socket);
     stompClient.connect(
       {},
@@ -166,8 +172,6 @@ export default function DirectMessage({ route, navigation }) {
         connected = false;
       }
     );
-
-
   }, []);
 
   const onReceiveMessage = useCallback((messages = []) => {
@@ -175,10 +179,10 @@ export default function DirectMessage({ route, navigation }) {
       GiftedChat.append(previousMessages, messages)
     );
   }, []);
-
-  const onSend = useCallback((messages = []) => {
-
-    stompClient.send(`/app/send-${roomId}`, JSON.stringify(messages[0]));
+  const onSend = useCallback(async (messages = []) => {
+    await stompClient.send(`/app/send-${roomId}`, JSON.stringify(messages[0]));
+    await stompClient.send(`/room/update-${user.userId ? user.userId : user}`);
+    await stompClient.send(`/notification/notification-${destination.userId}`, JSON.stringify({ sender: `${user.name} ${user.surname}`, message: messages[0].text }));
   }, []);
 
   return (
@@ -219,7 +223,7 @@ export default function DirectMessage({ route, navigation }) {
             _id: uuid(),
             createdAt: new Date(),
             user: {
-              _id: user
+              _id: user.userId ? user.userId : user
             },
             text: message[0].text,
           },
@@ -233,7 +237,7 @@ export default function DirectMessage({ route, navigation }) {
         onSend(message)
       }}
       user={{
-        _id: user,
+        _id: user.userId ? user.userId : user,
       }}
     />
   );
