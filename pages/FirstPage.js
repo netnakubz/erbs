@@ -5,7 +5,7 @@ import * as Google from "expo-google-app-auth";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import API from '../env/API';
 export const FirstPage = ({ route, navigation }) => {
-    const { ready } = route.params;
+    // const { ready } = route.params;
     const signInWithGoogleAsync = async () => {
         try {
             const result = await Google.logInAsync({
@@ -26,14 +26,13 @@ export const FirstPage = ({ route, navigation }) => {
                     console.log(e);
                 }
                 const isExist = await API.auth();
-                console.log(isExist);
-                if (!false) {
+                if (!isExist) {
                     navigation.navigate("SignUp", {
                         userInfo: result.user
                     });
                 } else {
-                    ready(true)
-                    navigation.goBack();
+                    // ready(true)
+                    navigation.navigate("BottomNav");
                 }
             }
         } catch (e) {

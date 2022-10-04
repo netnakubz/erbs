@@ -1,14 +1,16 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useLayoutEffect } from "react";
 import { View, Text, StyleSheet, FlatList, Animated, SafeAreaView } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 const { Value } = Animated;
 import StickyHeaderProfile from '../components/StickyHeaderProfile';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import API from '../env/API';
+import { Button } from "react-native-elements";
 export function PersonalScreen() {
     const navigation = useNavigation();
     const [ownerItems, setOwnerItems] = useState([]);
     const [isRefresh, setIsRefresh] = useState(false);
+ 
     const getMyItems = async () => {
         const data = await API.getMyItems();
         setOwnerItems(data);
@@ -23,11 +25,13 @@ export function PersonalScreen() {
         getMyItems();
         wait(2000).then(() => setIsRefresh(false));
     }, [isRefresh]);
-    useEffect(()=>{
+
+    useEffect(() => {
         navigation.setOptions({
-            name:"askd"
+            name: "askd"
         })
-    },[]);
+    }, []);
+
     return (
         <SafeAreaView style={{ flex: 1 }}>
             {

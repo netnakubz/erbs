@@ -2,6 +2,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import * as AppAuth from "expo-app-auth";
 import { DeviceEventEmitter } from "react-native";
+const config = {
+    issuer: 'https://accounts.google.com',
+    scopes: ['openid', 'profile'],
+    /* This is the CLIENT_ID generated from a Firebase project */
+    clientId: '777537428201-gtom0i1vt6d6ji3prin6nr7qfrkt6bp7.apps.googleusercontent.com',
+};
 axios.interceptors.response.use(
     undefined,
     async (error) => {
@@ -12,12 +18,7 @@ axios.interceptors.response.use(
                 originalConfig._retry = true;
                 // Do something, call refreshToken() request for example;
                 // return a request
-                let config = {
-                    issuer: 'https://accounts.google.com',
-                    scopes: ['openid', 'profile'],
-                    /* This is the CLIENT_ID generated from a Firebase project */
-                    clientId: '777537428201-gtom0i1vt6d6ji3prin6nr7qfrkt6bp7.apps.googleusercontent.com',
-                };
+
                 const refreshToken = await AsyncStorage.getItem("refreshToken");
                 let authState = await AppAuth.refreshAsync(config, refreshToken);
                 AsyncStorage.setItem("token", authState.idToken);
@@ -331,6 +332,32 @@ let API = {
                 { Authorization: `Bearer ${token}` }
         });
         return data.data;
+    },
+    getProvice: async () => {
+        const data = await axios.get("https://thaiaddressapi-thaikub.herokuapp.com/v1/thailand/provinces")
+        return data.data;
+    },
+    getDistrict: async (provice) => {
+        const data = await axios.get(`https://thaiaddressapi-thaikub.herokuapp.com/v1/thailand/provinces/${provice}/district`);
+        return data.data;
+    },
+    getSubDistrict: async (province, district) => {
+        const data = await axios.get(`https://thaiaddressapi-thaikub.herokuapp.com/v1/thailand/provinces/${province}/district/${district}`);
+        return data.data;
+    },
+    logout: async ({ setIsLogout }) => {
+        let token = await API.getToken();
+        try {
+            await AppAuth.revokeAsync(config, {
+                token: token,
+                isClientIdProvided: true,
+            });
+            await AsyncStorage.removeItem("token");
+            await AsyncStorage.removeItem("refreshToken");
+            return true;
+        } catch (e) {
+            alert(`Failed to revoke token: ${e.message}`);
+        }
     }
 
 };

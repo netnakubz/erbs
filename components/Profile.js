@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useLayoutEffect } from 'react';
 import {
     StyleSheet,
     View,
@@ -16,8 +16,11 @@ const bannerImage = require('../assets/snack-icon.png');
 const BANNER_HEIGHT = 180;
 import Ionicons from '@expo/vector-icons/Ionicons';
 import API from '../env/API';
+import { Button } from 'react-native-elements';
 export const Profile = ({ isOwnerProfile, items, receipts }) => {
     const navigation = useNavigation();
+    const [isLogout, setIsLogout] = useState(false);
+
     const [profile, setProfile] = useState({
         userId: 10001,
         firstName: "สมชาย",
@@ -25,6 +28,7 @@ export const Profile = ({ isOwnerProfile, items, receipts }) => {
         email: "6210210000@psu.ac.th",
         Tel: '0800000000'
     });
+    const [toPay, setToPay] = useState(0);
     const handlePressEditProfile = () => {
         navigation.navigate("EditUserProfile", {
             user: profile
@@ -33,10 +37,26 @@ export const Profile = ({ isOwnerProfile, items, receipts }) => {
     const handlePressAddItem = () => {
         navigation.navigate("AddItem");
     }
+    const signOut = async () => {
+        const data = await API.logout({ setIsLogout });
+        navigation.navigate("firstPage");
+    }
+    useLayoutEffect(() => {
+        navigation.setOptions({
+            headerRight: () => {
+                return (
+                    <TouchableOpacity onPress={async () => signOut()}>
+                        <Ionicons name='exit-outline' size={35} />
+                    </TouchableOpacity>
+                )
+            }
+        })
+    })
     const getMyProfile = async () => {
         const data = await API.getUserProfile();
         navigation.setOptions({
-            title: `${data.name} ${data.surname}`
+            title: `${data.name} ${data.surname}`,
+
         })
     }
     useEffect(() => {
@@ -66,8 +86,8 @@ export const Profile = ({ isOwnerProfile, items, receipts }) => {
                             </View>
                         }
                         <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                            <Text>1</Text>
-                            <Text>...</Text>
+                            <Text>{toPay}</Text>
+                            <Text>ต้องจ่าย</Text>
                         </View>
                     </View>
                     {isOwnerProfile &&

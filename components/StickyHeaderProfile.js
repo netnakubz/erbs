@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View, Image, FlatList } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
-import { Card } from "react-native-elements"
+import { Button, Card } from "react-native-elements"
 import { StickyHeaderScrollView } from 'react-native-simple-sticky-header';
 import { Profile } from './Profile';
 import DATA from './data';
@@ -9,7 +9,9 @@ import Hr from './Hr';
 import API from '../env/API';
 import { Section } from './Section';
 import { ListReceipt } from './ListReceipt';
+import { useNavigation } from '@react-navigation/native';
 export default function App(props) {
+    const navigation = useNavigation();
     const { items, setIsRefresh } = props;
     const itemHeight = 200 * (items.length / 3);
     const [showPage, setShowPage] = useState("myItems");

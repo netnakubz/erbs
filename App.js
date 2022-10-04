@@ -236,6 +236,7 @@ export default function App() {
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <NavigationContainer>
         <Stack.Navigator >
+          <Stack.Screen component={FirstPage} name="firstPage" options={{ headerShown: false }} />
           <Stack.Screen component={BottomNav} options={{ headerShown: false }} name="BottomNav" />
           <Stack.Screen component={ProductPage} name="ProductPage" />
           <Stack.Screen component={DirectMessage} name="DirectMessage" />
@@ -251,9 +252,7 @@ export default function App() {
           <Stack.Screen component={EquipmentSettings} name="EquipmentSettings" options={{ title: "ตั้งค่าอุปกรณ์" }} />
           <Stack.Screen component={SaveReceipt} name="SaveReceipt" />
           <Stack.Screen component={Receipt} name="ใบเสร็จ" />
-          <Stack.Screen component={FirstPage} name="firstPage" options={{ headerShown: false }} />
           <Stack.Screen component={SignUp} options={{ headerShown: false }} name="SignUp" />
-
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

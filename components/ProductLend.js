@@ -10,18 +10,37 @@ import { Card, Overlay, SearchBar } from 'react-native-elements';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ProductPage } from '../pages/ProductPage';
 import { useNavigation } from '@react-navigation/native';
+import API from '../env/API';
+import { Alert } from 'react-native';
 const ProductStack = createNativeStackNavigator();
 
 
 
 const ProductLend = ({ item }) => {
     const [usedColors, setUsedColors] = useState([]);
+    const [myProfile, setMyProfile] = useState({});
     const navigation = useNavigation();
-    const onClickItem = postId => {
+    const onClickItem = async postId => {
+        if (item.userId.userId === myProfile.userId) {
+            return Alert.alert("คุณเป็นเจ้าของโพสต์นี้");
+        }
+        const data = await API.searchRoom(item.userId.userId);
+        const des = myProfile.userId === data.userOne.userId ? data.userTwo : data.userOne;
+       console.log(item);
         navigation.navigate('DirectMessage', {
-            postId: postId
+            postId: postId,
+            roomId: data.roomId,
+            destination: des,
+            user: myProfile,
         });
     };
+    const getMyProfile = async () => {
+        const data = await API.getUserProfile();
+        setMyProfile(data);
+    }
+    useEffect(() => {
+        getMyProfile();
+    }, []);
     function generateRandomColor() {
         const colors = ["#FAC7C0", "#FFDB94", "#CAE3D4", "#F0D7C4", "#B9E4E7", "#FFCADD"];
         const randNumber = Math.floor(Math.random() * colors.length);
