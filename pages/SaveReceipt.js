@@ -13,6 +13,7 @@ import {
 import ViewShot from 'react-native-view-shot';
 import * as MediaLibrary from "expo-media-library";
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import API from '../env/API';
 const Hr = ({ size }) => {
     const [hr, setHr] = useState();
@@ -26,9 +27,9 @@ const Hr = ({ size }) => {
     return <Text style={{ textAlign: "center" }}>{hr}</Text>
 }
 export const SaveReceipt = ({ route }) => {
-    const { receipt } = route.params;
+    const { receipt, status } = route.params;
     const [borrower, setBorrower] = useState();
-    const [period,setPeriod] = useState();
+    const [period, setPeriod] = useState();
     const ref = useRef();
     const saveImg = async () => {
         ref.current.capture().then(uri => {
@@ -42,6 +43,22 @@ export const SaveReceipt = ({ route }) => {
         let bo = receipt.contractModel.roomModel.userOne.userId === owner ? receipt.contractModel.roomModel.userTwo : receipt.contractModel.roomModel.userOne;
         setBorrower(bo);
     }, [])
+    const navigation = useNavigation();
+    const returnItem = async () => {
+    }
+    useEffect(() => {
+        console.log(status);
+        if (status === "owner")
+            navigation.setOptions({
+                headerRight: () => {
+                    return (
+                        <TouchableOpacity onPress={async () => returnItem()}>
+                            <Text>ยืนยันการคืน</Text>
+                        </TouchableOpacity>
+                    )
+                }
+            })
+    }, []);
     return (
         <View style={styles.container}>
             <ViewShot ref={ref}

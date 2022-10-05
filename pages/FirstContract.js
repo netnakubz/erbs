@@ -40,6 +40,7 @@ export const FirstContract = ({ navigation, route }) => {
     const [equipments, setEquipments] = useState([]);
     const { setNewContract, newContract, values, save, roomId } = route.params;
     const [show, setShow] = useState(false);
+    const [isPressAccept, setIsPressAccept] = useState(false);
     const createPDF = async () => {
         const currentDate = new Date();
 
@@ -245,6 +246,7 @@ export const FirstContract = ({ navigation, route }) => {
     }
     const acceptTheContract = () => {
         API.acceptTheContract(contract.contractId);
+        setEditAble(false);
     }
     return (
         <SafeAreaView style={{ flex: 1 }}>
@@ -588,7 +590,6 @@ export const FirstContract = ({ navigation, route }) => {
                             <View>
                             </View>
             }
-
         </SafeAreaView >
 
     );

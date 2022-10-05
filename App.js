@@ -55,10 +55,9 @@ import { SaveReceipt } from './pages/SaveReceipt';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SignUp } from './pages/SignUp';
 
-const BottomNav = ({ readyNow }) => {
+const BottomNav = ({ setIsReady, isReady }) => {
   const [homePage, setHomePage] = useState(true);
   const navigation = useNavigation();
-  const [isReady, setIsReady] = useState(false);
   const checkToken = async () => {
     let token = await AsyncStorage.getItem("token");
     // await AsyncStorage.clear("token");
@@ -145,16 +144,12 @@ Notifications.setNotificationHandler({
 });
 export default function App() {
   LogBox.ignoreAllLogs()
+  const [isReady, setIsReady] = useState(false);
   const SOCKET_URL = `${API.domain}/ws`;
   var socket = '';
   var stompClient = '';
   var connected = false;
   socket = new SockJS(SOCKET_URL);
-  const [userProfile, setUserProfile] = useState([]);
-  const getUserProfile = async () => {
-    const data = await API.getUserProfile();
-    setUserProfile(data);
-  }
   const connectSocket = async () => {
     const data = await API.getUserProfile();
     stompClient = Stomp.over(socket);
@@ -236,14 +231,16 @@ export default function App() {
     };
   }, []);
   useEffect(() => {
-    getUserProfile();
-    connectSocket();
-  }, []);
+    if (isReady === true)
+      connectSocket();
+  }, [isReady === true]);
   return (
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <NavigationContainer>
         <Stack.Navigator >
-          <Stack.Screen component={BottomNav} options={{ headerShown: false }} name="BottomNav" />
+          <Stack.Screen children={() =>
+            <BottomNav setIsReady={setIsReady} isReady={isReady} />
+          } options={{ headerShown: false }} name="BottomNav" />
           <Stack.Screen component={ProductPage} name="ProductPage" />
           <Stack.Screen component={DirectMessage} name="DirectMessage" />
           <Stack.Screen component={LendPage} name="LendPage" options={{ title: "โพสต์ปล่อยเช่า" }} />

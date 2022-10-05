@@ -1,10 +1,10 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-export const ListReceipt = ({ receipt }) => {
+export const ListReceipt = ({ receipt, status }) => {
     const naviation = useNavigation();
     const handleOnPressReceipt = (item) => {
-        naviation.navigate("SaveReceipt", { receipt: item });
+        naviation.navigate("SaveReceipt", { receipt: item, status: status });
     }
     return (
         receipt.map((item) => (

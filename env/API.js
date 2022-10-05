@@ -14,7 +14,7 @@ axios.interceptors.response.use(
         console.log(error.response.status)
         const originalConfig = error.config;
         if (error.response) {
-            if (error.response.status === 401) {
+            if (error.response.status === 401 || error.response.status === 500) {
                 originalConfig._retry = true;
                 // Do something, call refreshToken() request for example;
                 // return a request
@@ -308,7 +308,7 @@ let API = {
         return data.data;
     },
     addOrUpdateUser: async (user) => {
-        let token = await API.getToken("auth");
+        let token = await API.getToken("addOrUpdate");
         const data = await axios.post(`${API.domain}/api/v1/updateUserInformation`,
             user
             , {
@@ -318,7 +318,7 @@ let API = {
         return data === null;
     },
     getUserProfile: async () => {
-        let token = await API.getToken("auth");
+        let token = await API.getToken("getUserProfile");
         const data = await axios.get(`${API.domain}/api/v1/profile`, {
             headers:
                 { Authorization: `Bearer ${token}` }
@@ -326,7 +326,7 @@ let API = {
         return data.data;
     },
     getReceipt: async () => {
-        let token = await API.getToken("auth");
+        let token = await API.getToken("getReceipt");
         const data = await axios.get(`${API.domain}/api/v1/get/receipt`, {
             headers:
                 { Authorization: `Bearer ${token}` }
@@ -346,7 +346,7 @@ let API = {
         return data.data;
     },
     logout: async ({ setIsLogout }) => {
-        let token = await API.getToken();
+        let token = await API.getToken("logout");
         try {
             await AppAuth.revokeAsync(config, {
                 token: token,
@@ -360,7 +360,7 @@ let API = {
         }
     },
     searchPostBorrow: async (query) => {
-        let token = await API.getToken();
+        let token = await API.getToken("search");
         const data = await axios.get(`${API.domain}/api/v1/post/rent/search?query=${query}`, {
             headers:
                 { Authorization: `Bearer ${token}` }
@@ -368,12 +368,19 @@ let API = {
         return data.data;
     },
     searchPostLend: async (query) => {
-        let token = await API.getToken();
+        let token = await API.getToken("search");
         const data = await axios.get(`${API.domain}/api/v1/post/borrow/search?query=${query}`, {
             headers:
                 { Authorization: `Bearer ${token}` }
         });
-        console.log(data.data);
+        return data.data;
+    },
+    getMyRenting: async () => {
+        let token = await API.getToken("search");
+        const data = await axios.get(`${API.domain}/api/v1/get/renting`, {
+            headers:
+                { Authorization: `Bearer ${token}` }
+        });
         return data.data;
     }
 

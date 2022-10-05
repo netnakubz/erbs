@@ -19,6 +19,7 @@ export default function App(props) {
     const [showPage, setShowPage] = useState("myItems");
     const [isOwnerProfile, setIsOwnerProfile] = useState(true);
     const [receipt, setReceipt] = useState([]);
+    const [myRenting, setMyRenting] = useState([]);
     const hadleShowPage = (page) => {
         setShowPage(page);
     }
@@ -26,8 +27,14 @@ export default function App(props) {
         const data = await API.getReceipt();
         setReceipt(data);
     }
+    const getMyRenting = async () => {
+        const data = await API.getMyRenting();
+        setMyRenting(data);
+    }
+    
     useEffect(() => {
         getReceipt();
+        getMyRenting();
     }, []);
 
     return (
@@ -50,7 +57,7 @@ export default function App(props) {
                             justifyContent: 'space-between',
                         }}
                     >
-                        <Profile isOwnerProfile={isOwnerProfile} items={items} receipts={receipt}  setIsReady={setIsReady} isReady={isReady}/>
+                        <Profile isOwnerProfile={isOwnerProfile} items={items} receipts={receipt} setIsReady={setIsReady} isReady={isReady} />
                     </View>
                 </View>
             )}
@@ -76,7 +83,7 @@ export default function App(props) {
                         <Feather size={25} name="file-text" />
                     </TouchableOpacity>
                     <TouchableOpacity
-                        onPress={() => hadleShowPage("myItems")}
+                        onPress={() => hadleShowPage("renting")}
                     >
                         <Feather size={25} name="sliders" />
                     </TouchableOpacity>
@@ -102,7 +109,10 @@ export default function App(props) {
                             </View>
                         )) ||
                         showPage === "receipt" &&
-                        <ListReceipt receipt={receipt} />
+                        <ListReceipt receipt={receipt} status={"owner"} />
+                        ||
+                        showPage === "renting" &&
+                        <ListReceipt receipt={myRenting} status={"borrower"} />
                     }
                 </View>
             </View>
