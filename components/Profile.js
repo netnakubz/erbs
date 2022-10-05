@@ -17,7 +17,7 @@ const BANNER_HEIGHT = 180;
 import Ionicons from '@expo/vector-icons/Ionicons';
 import API from '../env/API';
 import { Button } from 'react-native-elements';
-export const Profile = ({ isOwnerProfile, items, receipts }) => {
+export const Profile = ({ isOwnerProfile, items, receipts, setIsReady, isReady }) => {
     const navigation = useNavigation();
     const [isLogout, setIsLogout] = useState(false);
 
@@ -39,10 +39,18 @@ export const Profile = ({ isOwnerProfile, items, receipts }) => {
     }
     const signOut = async () => {
         const data = await API.logout({ setIsLogout });
-        navigation.navigate("firstPage");
+        setIsReady(false);
+        navigation.navigate("firstPage", {
+            ready: (e) => setIsReady(e)
+        })
     }
     useLayoutEffect(() => {
+
+    })
+    const getMyProfile = async () => {
+        const data = await API.getUserProfile();
         navigation.setOptions({
+            title: `${data.name} ${data.surname}`,
             headerRight: () => {
                 return (
                     <TouchableOpacity onPress={async () => signOut()}>
@@ -50,13 +58,6 @@ export const Profile = ({ isOwnerProfile, items, receipts }) => {
                     </TouchableOpacity>
                 )
             }
-        })
-    })
-    const getMyProfile = async () => {
-        const data = await API.getUserProfile();
-        navigation.setOptions({
-            title: `${data.name} ${data.surname}`,
-
         })
     }
     useEffect(() => {

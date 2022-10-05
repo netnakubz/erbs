@@ -54,7 +54,8 @@ import { FirstPage } from './pages/FirstPage';
 import { SaveReceipt } from './pages/SaveReceipt';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SignUp } from './pages/SignUp';
-const BottomNav = () => {
+
+const BottomNav = ({ readyNow }) => {
   const [homePage, setHomePage] = useState(true);
   const navigation = useNavigation();
   const [isReady, setIsReady] = useState(false);
@@ -118,7 +119,11 @@ const BottomNav = () => {
           />
           <Tab.Screen name="Like" options={{ title: "สิ่งที่ฉันถูกใจ" }} component={LikeScreen} />
           <Tab.Screen name="Chat" options={{ headerShown: false }} component={ListChat} />
-          <Tab.Screen name="PersonalScreen" component={PersonalScreen} />
+          <Tab.Screen name="PersonalScreen"
+            children={props =>
+              < PersonalScreen setIsReady={setIsReady} isReady={isReady} {...props} />
+            }
+          />
         </Tab.Navigator>
       }
     </View>
@@ -129,6 +134,8 @@ import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import SockJS from 'sockjs-client';
 import Stomp from 'webstomp-client';
+import { SearchPostBorrow } from './components/SearchPostBorrow';
+import { SearchPostLend } from './components/SearchPostLend';
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -236,7 +243,6 @@ export default function App() {
     <SafeAreaProvider initialMetrics={initialWindowMetrics}>
       <NavigationContainer>
         <Stack.Navigator >
-          <Stack.Screen component={FirstPage} name="firstPage" options={{ headerShown: false }} />
           <Stack.Screen component={BottomNav} options={{ headerShown: false }} name="BottomNav" />
           <Stack.Screen component={ProductPage} name="ProductPage" />
           <Stack.Screen component={DirectMessage} name="DirectMessage" />
@@ -253,6 +259,9 @@ export default function App() {
           <Stack.Screen component={SaveReceipt} name="SaveReceipt" />
           <Stack.Screen component={Receipt} name="ใบเสร็จ" />
           <Stack.Screen component={SignUp} options={{ headerShown: false }} name="SignUp" />
+          <Stack.Screen component={FirstPage} name="firstPage" options={{ headerShown: false }} />
+          <Stack.Screen component={SearchPostBorrow} name="SearchPostBorrow" options={{ title: "ค้นหา" }} />
+          <Stack.Screen component={SearchPostLend} name="SearchPostLend" options={{ title: "ค้นหา" }} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

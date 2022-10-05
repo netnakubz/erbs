@@ -12,6 +12,8 @@ import { ListReceipt } from './ListReceipt';
 import { useNavigation } from '@react-navigation/native';
 export default function App(props) {
     const navigation = useNavigation();
+    const { setIsReady, isReady } = props;
+
     const { items, setIsRefresh } = props;
     const itemHeight = 200 * (items.length / 3);
     const [showPage, setShowPage] = useState("myItems");
@@ -48,7 +50,7 @@ export default function App(props) {
                             justifyContent: 'space-between',
                         }}
                     >
-                        <Profile isOwnerProfile={isOwnerProfile} items={items} receipts={receipt} />
+                        <Profile isOwnerProfile={isOwnerProfile} items={items} receipts={receipt}  setIsReady={setIsReady} isReady={isReady}/>
                     </View>
                 </View>
             )}

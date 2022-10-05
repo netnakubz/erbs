@@ -5,7 +5,7 @@ import * as Google from "expo-google-app-auth";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import API from '../env/API';
 export const FirstPage = ({ route, navigation }) => {
-    // const { ready } = route.params;
+    const { ready } = route.params;
     const signInWithGoogleAsync = async () => {
         try {
             const result = await Google.logInAsync({
@@ -18,6 +18,7 @@ export const FirstPage = ({ route, navigation }) => {
                     access_type: "offline"
                 },
             });
+            console.log(result.idToken)
             if (result.type === 'success') {
                 try {
                     await AsyncStorage.setItem("token", result.idToken);
@@ -31,8 +32,10 @@ export const FirstPage = ({ route, navigation }) => {
                         userInfo: result.user
                     });
                 } else {
-                    // ready(true)
-                    navigation.navigate("BottomNav");
+                    ready(true)
+                    navigation.navigate("BottomNav", {
+                        readyNow: true
+                    });
                 }
             }
         } catch (e) {

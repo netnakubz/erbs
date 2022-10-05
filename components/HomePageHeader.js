@@ -10,11 +10,13 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { UnderHeader } from "./UnderHeader";
 import { Card, Overlay, SearchBar } from 'react-native-elements';
 import API from "../env/API";
-
+import { useNavigation } from "@react-navigation/native";
 export const HomePageHeader = ({ content, page, value, setValue, selectedType, setSelectedType }) => {
-    const [searchText, setSearchText] = useState('');
+    const navigation = useNavigation();
     const [typeOfItem, setTypeOfItem] = useState([]);
     const [itemType, setItemType] = useState([]);
+    const [searchText, setSearchText] = useState('');
+
     const handleSearchText = e => {
         setSearchText(e);
     };
@@ -29,6 +31,18 @@ export const HomePageHeader = ({ content, page, value, setValue, selectedType, s
     useEffect(() => {
         getItemType();
     }, []);
+
+    const handleSubmit = async () => {
+        const key = searchText;
+        if (page === "FindToBorrow")
+            navigation.navigate("SearchPostBorrow", {
+                searchText: key
+            });
+        else if (page === "FindToLend")
+            navigation.navigate("SearchPostLend", {
+                searchText: key
+            });
+    }
     return (
         <View>
             <View>
@@ -44,6 +58,8 @@ export const HomePageHeader = ({ content, page, value, setValue, selectedType, s
                     placeholder="What are you looking for?"
                     onChangeText={e => handleSearchText(e)}
                     value={searchText}
+                    onSubmitEditing={() => handleSubmit()}
+                    returnKeyType={"search"}
                 />
             </View>
             {page === "FindToBorrow" &&

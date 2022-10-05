@@ -358,6 +358,23 @@ let API = {
         } catch (e) {
             alert(`Failed to revoke token: ${e.message}`);
         }
+    },
+    searchPostBorrow: async (query) => {
+        let token = await API.getToken();
+        const data = await axios.get(`${API.domain}/api/v1/post/rent/search?query=${query}`, {
+            headers:
+                { Authorization: `Bearer ${token}` }
+        });
+        return data.data;
+    },
+    searchPostLend: async (query) => {
+        let token = await API.getToken();
+        const data = await axios.get(`${API.domain}/api/v1/post/borrow/search?query=${query}`, {
+            headers:
+                { Authorization: `Bearer ${token}` }
+        });
+        console.log(data.data);
+        return data.data;
     }
 
 };

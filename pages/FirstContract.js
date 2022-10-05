@@ -41,6 +41,8 @@ export const FirstContract = ({ navigation, route }) => {
     const { setNewContract, newContract, values, save, roomId } = route.params;
     const [show, setShow] = useState(false);
     const createPDF = async () => {
+        const currentDate = new Date();
+
         const html = `
         <!DOCTYPE html>
         <html lang="en">
@@ -64,28 +66,26 @@ export const FirstContract = ({ navigation, route }) => {
                 <span>ทำที่ ระบบเช่ายืมอุปกรณ์คอมพิวเตอร์</span>
               </div>
               <div class="d-flex justify-content-end">
-                <span>วันที่ ........ เดือน ......... พ.ศ. ......</span>
+                <span>วันที่ ${currentDate.getDay()} เดือน ${currentDate.getMonth()} พ.ศ. ${currentDate.getFullYear()} </span>
               </div>
               <div class="text-warp">
                 <div class="row">
                   <p>
                     สัญญานี้ทำขึ้นระหว่าง
-                    ....................................................
+                    ${userIdBorrower.name} ${userIdBorrower.surname}
                     บัตรประจำตัวประชาชน
-                    .................................................... อยู่บ้านเลขที่
+                    ${userIdBorrower.idNumber} อยู่บ้านเลขที่
                     .................................................... ถนน
-                    .................................................... ตำบล/แขวง
-                    .................................................... อำเภอ/เขต
-                    .................................................... จังหวัด
-                    ....................................................
+                    ${userIdBorrower.homeAddressModel.road} อำเภอ/เขต
+                    ${userIdBorrower.homeAddressModel.district} จังหวัด
+                    ${userIdBorrower.homeAddressModel.province}
                     ซึ่งต่อไปในสัญญานี้จะเรียกว่า "ผู้เช่า" ฝ่ายหนึ่ง กับ
-                    .................................................... อยู่บ้านเลขที่
+                    ${userIdOwner.name} ${userIdOwner.surname} อยู่บ้านเลขที่
                     .................................................... ถนน
-                    .................................................... ตำบล/แขวง
-                    ....................................................
-                    อำเภอ/เขต....................................................
+                    ${userIdOwner.homeAddressModel.road} 
+                    อำเภอ/เขต ${userIdOwner.homeAddressModel.district}
                     จังหวัด
-                    ....................................................ซึ่งต่อไปในสัญญานี้จะเรียกว่า
+                    ${userIdOwner.homeAddressModel.province} ซึ่งต่อไปในสัญญานี้จะเรียกว่า
                     "ผู้ให้เช่า" อีกฝ่ายหนึ่ง
                   </p>
                 </div>
@@ -95,30 +95,29 @@ export const FirstContract = ({ navigation, route }) => {
                 <div class="d-flex justify-content-start">
                   <p>
                     ข้อ 1. ผู้ให้เช่าตกลงให้เช่าและผู้ตกลงเช่าอุปกรณ์
-                    .................................................... หมายเลข serial
-                    ....................................................
+                    ${equipment.name} หมายเลข serial
+                    ${equipment.equipmentSerials[0].serial}
                   </p>
                 </div>
                 <div class="d-flex justify-content-start">
                   <p>
                     ข้อ 2. คู่สัญญาตกลงเช่าทัพตามสัญญามีกำหนด
-                    .................................................... วัน
                     นับตั้งแต่วันที่
-                    .................................................... เดือน
-                    .................................................... พ.ศ.
-                    .................................................... ถึงวันที่
-                    .................................................... เดือน
-                    .................................................... พ.ศ.
-                    ....................................................
+                    ${contract.startDate.split("T")[0].split("-")[2]} เดือน
+                    ${contract.startDate.split("T")[0].split("-")[1]}พ.ศ.
+                    ${contract.startDate.split("T")[0].split("-")[0]} ถึงวันที่
+                    ${contract.endDate.split("T")[0].split("-")[2]} เดือน
+                    ${contract.endDate.split("T")[0].split("-")[1]} พ.ศ.
+                    ${contract.endDate.split("T")[0].split("-")[0]}
                     โดยผู้เช่าตกลงชำระเงินค่าเช่าให้แก่ผู้ให้เช่าเป็นจำนวนเงิน
-                    .................................................... ในวันรับอุปกรณ์
+                    ${contract.price} ในวันรับอุปกรณ์
                   </p>
-                </div>
+                </div> 
                 <div class="d-flex justify-content-start">
                   <p>
                     ข้อ 3.
                     ผู้เช่าจะต้องเป็นผู้ชำระค่าเสียหายที่เกิดขึ้นกับอุปกรณ์ที่เกิดจากความเสียหายของผู้เช่าเป็นจำวนเงิน
-                    .................................................... บาท
+                    ${contract.fineBroken} บาท
                     ตามที่ได้ตกลงกันไว้
                   </p>
                 </div>
@@ -160,6 +159,7 @@ export const FirstContract = ({ navigation, route }) => {
     const getEquipment = () => {
 
     }
+
     const setValues = async () => {
         const contract = await API.getContract(values);
         const owner = contract.roomModel.userOne.userId === contract.equipmentModel.userId ? contract.roomModel.userOne : contract.roomModel.userTwo;
@@ -333,6 +333,33 @@ export const FirstContract = ({ navigation, route }) => {
                             totalItem={equipment.quantity}
                         />
                     }
+                    <ModalSelector
+                        disabled={save ? false : true}
+                        onChange={(selector) => {
+                            handleItemPick(selector)
+                        }}
+                        ref={selector => { selector = selector; }}
+                        data={equipments}
+                        keyExtractor={item => uuidv4()}
+                        labelExtractor={item => item.name}
+                    >
+                        <TouchableOpacity>
+                            <Section >
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                        <Text style={{ fontSize: 16 }}>อุปกรณ์</Text>
+                                        <Text style={{ color: "#FF6820" }}> *</Text>
+                                    </View>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                        <Text style={{ fontSize: 16 }}>{equipment.name}</Text>
+                                        {save &&
+                                            <Ionicons name="chevron-forward" size={30} color={"#B4B4B4"} />
+                                        }
+                                    </View>
+                                </View>
+                            </Section>
+                        </TouchableOpacity>
+                    </ModalSelector>
                     <TouchableOpacity
                         onPress={() => {
                             setTotalRentModalVisible(save ? true : false);

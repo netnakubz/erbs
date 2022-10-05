@@ -6,11 +6,12 @@ import StickyHeaderProfile from '../components/StickyHeaderProfile';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import API from '../env/API';
 import { Button } from "react-native-elements";
-export function PersonalScreen() {
+export function PersonalScreen(props) {
+    const { setIsReady, isReady } = props;
     const navigation = useNavigation();
     const [ownerItems, setOwnerItems] = useState([]);
     const [isRefresh, setIsRefresh] = useState(false);
- 
+
     const getMyItems = async () => {
         const data = await API.getMyItems();
         setOwnerItems(data);
@@ -35,7 +36,7 @@ export function PersonalScreen() {
     return (
         <SafeAreaView style={{ flex: 1 }}>
             {
-                ownerItems && <StickyHeaderProfile items={ownerItems} setIsRefresh={setIsRefresh} />
+                ownerItems && <StickyHeaderProfile items={ownerItems} setIsRefresh={setIsRefresh}  setIsReady={setIsReady} isReady={isReady}/>
             }
         </SafeAreaView>
     );
