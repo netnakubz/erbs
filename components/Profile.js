@@ -17,7 +17,7 @@ const BANNER_HEIGHT = 180;
 import Ionicons from '@expo/vector-icons/Ionicons';
 import API from '../env/API';
 import { Button } from 'react-native-elements';
-export const Profile = ({ isOwnerProfile, items, receipts, setIsReady, isReady }) => {
+export const Profile = ({ isOwnerProfile, items, receipts, setIsReady, isReady,toPay }) => {
     const navigation = useNavigation();
     const [isLogout, setIsLogout] = useState(false);
 
@@ -28,7 +28,6 @@ export const Profile = ({ isOwnerProfile, items, receipts, setIsReady, isReady }
         email: "6210210000@psu.ac.th",
         Tel: '0800000000'
     });
-    const [toPay, setToPay] = useState(0);
     const handlePressEditProfile = () => {
         navigation.navigate("EditUserProfile", {
             user: profile

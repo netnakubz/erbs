@@ -14,7 +14,7 @@ axios.interceptors.response.use(
         console.log(error.response.status)
         const originalConfig = error.config;
         if (error.response) {
-            if (error.response.status === 401 || error.response.status === 500) {
+            if (error.response.status === 401 ) {
                 originalConfig._retry = true;
                 // Do something, call refreshToken() request for example;
                 // return a request
@@ -205,7 +205,6 @@ let API = {
     },
     getItemType: async () => {
         let token = await API.getToken("getItemType");
-
         const data = await axios.get(`${API.domain}/api/v1/get/itemType`,
             {
                 headers:
@@ -213,19 +212,17 @@ let API = {
             });
         return data.data;
     },
+    getItemSerial:async(itemId)=>{
+      let token = await API.getToken("getItemSerial");
+      const data = await axios.get(`${API.domain}/api/v1/get/itemSerial?itemId=${itemId}`,{
+          headers:
+              { Authorization: `Bearer ${token}` }
+      });
+      return data.data;
+    },
     getMyItems: async () => {
         let token = await API.getToken("getMyItems");
         const data = await axios.get(`${API.domain}/api/v1/get/all/equipment`,
-            {
-                headers:
-                    { Authorization: `Bearer ${token}` }
-            });
-        return data.data;
-    },
-    getItemType: async () => {
-        let token = await API.getToken("getItemType");
-
-        const data = await axios.get(`${API.domain}/api/v1/getItemType`,
             {
                 headers:
                     { Authorization: `Bearer ${token}` }
@@ -382,6 +379,14 @@ let API = {
                 { Authorization: `Bearer ${token}` }
         });
         return data.data;
+    },
+    deleteItem:async(itemId)=>{
+        let token = await API.getToken("search");
+        const data = await axios.delete(`${API.domain}/api/v1/delete/item?itemId=${itemId}`,
+            {
+                headers:
+                    { Authorization: `Bearer ${token}` }
+            });
     }
 
 };

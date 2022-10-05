@@ -18,6 +18,7 @@ export const FirstPage = ({ route, navigation }) => {
                     access_type: "offline"
                 },
             });
+            console.log(result.idToken)
             if (result.type === 'success') {
                 try {
                     await AsyncStorage.setItem("token", result.idToken);

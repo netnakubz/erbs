@@ -31,7 +31,6 @@ export const RentPage = () => {
     const handleSaveBtn = async () => {
         let post = {
             "details": postDetails,
-            "userId": 10001,
             "price": itemPrice,
             "period": itemDate
         }
@@ -39,12 +38,6 @@ export const RentPage = () => {
             navigation.goBack();
         });
     }
-    const setData = async () => {
-
-    }
-    useEffect(() => {
-        setData();
-    }, []);
     return (
         <DismissKeyboard>
             <View style={styles.container}>
@@ -109,12 +102,7 @@ export const RentPage = () => {
                                                 multiline={true}
                                                 defaultValue={postDetails}
                                                 maxLength={500}
-                                                containerStyle={{
-                                                    height: Dimensions.get('window').height,
-                                                }}
-                                                inputContainerStyle={{
-                                                    borderBottomColor: "#00000000"
-                                                }}
+
                                                 placeholder="เพิ่มรายละเอียดอุปกรณ์"
                                                 onChangeText={(e) => handlePostDetails(e)}
                                             />
