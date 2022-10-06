@@ -129,7 +129,6 @@ export const EditUserProfile = ({ navigation, route }) => {
     const getMyProfile = async () => {
         const data = await API.getUserProfile();
         if (data) {
-            console.log(data);
             setIdNumber(data.idNumber);
             setFirstName(data.name);
             setLastName(data.surname);

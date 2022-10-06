@@ -26,7 +26,6 @@ const ProductLend = ({ item }) => {
         }
         const data = await API.searchRoom(item.userId.userId);
         const des = myProfile.userId === data.userOne.userId ? data.userTwo : data.userOne;
-       console.log(item);
         navigation.navigate('DirectMessage', {
             postId: postId,
             roomId: data.roomId,

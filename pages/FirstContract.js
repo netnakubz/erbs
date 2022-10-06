@@ -1,5 +1,5 @@
-import {Ionicons} from "@expo/vector-icons";
-import React, {useEffect, useState} from "react";
+import { Ionicons } from "@expo/vector-icons";
+import React, { useEffect, useState } from "react";
 import {
     View,
     Text,
@@ -14,20 +14,20 @@ import {
     Touchable,
     Alert
 } from "react-native";
-import {Button} from "react-native-elements";
-import {TouchableOpacity} from "react-native-gesture-handler";
-import {Section} from "../components/Section";
+import { Button } from "react-native-elements";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { Section } from "../components/Section";
 import ModalSelector from 'react-native-modal-selector'
-import {Input} from "react-native-elements";
-import {ContractModal} from "../components/ContractModal";
+import { Input } from "react-native-elements";
+import { ContractModal } from "../components/ContractModal";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import API from "../env/API";
-import {v4 as uuidv4} from "uuid";
+import { v4 as uuidv4 } from "uuid";
 import 'react-native-get-random-values';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 
-export const FirstContract = ({navigation, route}) => {
+export const FirstContract = ({ navigation, route }) => {
     const [userItem, setUserItem] = useState("");
     const [userIdOwner, setUserIdOwner] = useState({});
     const [userIdBorrower, setUesrIdBorrower] = useState({});
@@ -52,7 +52,7 @@ export const FirstContract = ({navigation, route}) => {
     const [roomNumber, setRoomNumber] = useState(null);
     const [contract, setContract] = useState(null);
     const [equipments, setEquipments] = useState([]);
-    const {setNewContract, newContract, values, save, roomId} = route.params;
+    const { setNewContract, newContract, values, save, roomId } = route.params;
     const [show, setShow] = useState(false);
     const [serial, setSerial] = useState([]);
     const [isPressAccept, setIsPressAccept] = useState(false);
@@ -71,6 +71,13 @@ export const FirstContract = ({navigation, route}) => {
               rel="stylesheet"
               integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
               crossorigin="anonymous" />
+              <style>
+      @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@100;200;300;400;500&display=swap');
+      body {
+        font-family: 'Sarabun', sans-serif;
+        font-weight: 400;
+      }
+    </style>
           </head>
           <body>
             <div class="container">
@@ -89,14 +96,12 @@ export const FirstContract = ({navigation, route}) => {
                     สัญญานี้ทำขึ้นระหว่าง
                     ${userIdBorrower.name} ${userIdBorrower.surname}
                     บัตรประจำตัวประชาชน
-                    ${userIdBorrower.idNumber} อยู่บ้านเลขที่
-                    .................................................... ถนน
+                    ${userIdBorrower.idNumber}ถนน
                     ${userIdBorrower.homeAddressModel.road} อำเภอ/เขต
                     ${userIdBorrower.homeAddressModel.district} จังหวัด
                     ${userIdBorrower.homeAddressModel.province}
                     ซึ่งต่อไปในสัญญานี้จะเรียกว่า "ผู้เช่า" ฝ่ายหนึ่ง กับ
-                    ${userIdOwner.name} ${userIdOwner.surname} อยู่บ้านเลขที่
-                    .................................................... ถนน
+                    ${userIdOwner.name} ${userIdOwner.surname} ถนน
                     ${userIdOwner.homeAddressModel.road} 
                     อำเภอ/เขต ${userIdOwner.homeAddressModel.district}
                     จังหวัด
@@ -144,7 +149,7 @@ export const FirstContract = ({navigation, route}) => {
           </body>
         </html>
         `;
-        const {uri} = await Print.printToFileAsync({html});
+        const { uri } = await Print.printToFileAsync({ html });
         Sharing.shareAsync(uri);
     }
     const handleSendContract = () => {
@@ -222,7 +227,7 @@ export const FirstContract = ({navigation, route}) => {
         setEquipments(e);
     }
     const handleSerial = () => {
-        if(equipment?.name === undefined){
+        if (equipment?.name === undefined) {
             return;
         }
         navigation.navigate("Serial", {
@@ -274,12 +279,12 @@ export const FirstContract = ({navigation, route}) => {
         setEditAble(false);
     }
     return (
-        <SafeAreaView style={{flex: 1}}>
+        <SafeAreaView style={{ flex: 1 }}>
             <ScrollView
                 contentContainerStyle={{
                     flexGrow: 1,
                 }}>
-                <View style={{flex: 1}}>
+                <View style={{ flex: 1 }}>
                     {room &&
                         <ModalSelector
                             disabled={save ? false : true}
@@ -295,15 +300,15 @@ export const FirstContract = ({navigation, route}) => {
                         >
                             <TouchableOpacity>
                                 <Section marginTop={10}>
-                                    <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                            <Text style={{fontSize: 16}}>เจ้าของ</Text>
-                                            <Text style={{color: "#FF6820"}}> *</Text>
+                                    <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                            <Text style={{ fontSize: 16 }}>เจ้าของ</Text>
+                                            <Text style={{ color: "#FF6820" }}> *</Text>
                                         </View>
-                                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                             <Text>{userIdOwner.name}</Text>
                                             {save &&
-                                                <Ionicons name="chevron-forward" size={30} color={"#B4B4B4"}/>
+                                                <Ionicons name="chevron-forward" size={30} color={"#B4B4B4"} />
                                             }
                                         </View>
                                     </View>
@@ -312,18 +317,18 @@ export const FirstContract = ({navigation, route}) => {
                         </ModalSelector>
                     }
                     <Section marginTop={2}>
-                        <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                <Text style={{fontSize: 16}}>ผู้เช่า</Text>
-                                <Text style={{color: "#FF6820"}}> *</Text>
+                        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                <Text style={{ fontSize: 16 }}>ผู้เช่า</Text>
+                                <Text style={{ color: "#FF6820" }}> *</Text>
                             </View>
-                            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <Text>{userIdBorrower.name}</Text>
                             </View>
                         </View>
                     </Section>
-                    <View style={{flexDirection: 'row', height: 30, alignItems: 'center'}}>
-                        <Text style={{textAlignVertical: 'center'}}>การเช่า</Text>
+                    <View style={{ flexDirection: 'row', height: 30, alignItems: 'center' }}>
+                        <Text style={{ textAlignVertical: 'center' }}>การเช่า</Text>
                     </View>
                     <ModalSelector
                         disabled={save ? false : true}
@@ -339,15 +344,15 @@ export const FirstContract = ({navigation, route}) => {
                     >
                         <TouchableOpacity>
                             <Section>
-                                <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                        <Text style={{fontSize: 16}}>อุปกรณ์</Text>
-                                        <Text style={{color: "#FF6820"}}> *</Text>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                        <Text style={{ fontSize: 16 }}>อุปกรณ์</Text>
+                                        <Text style={{ color: "#FF6820" }}> *</Text>
                                     </View>
-                                    <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                        <Text style={{fontSize: 16}}>{equipment.name}</Text>
+                                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                        <Text style={{ fontSize: 16 }}>{equipment.name}</Text>
                                         {save &&
-                                            <Ionicons name="chevron-forward" size={30} color={"#B4B4B4"}/>
+                                            <Ionicons name="chevron-forward" size={30} color={"#B4B4B4"} />
                                         }
                                     </View>
                                 </View>
@@ -393,15 +398,15 @@ export const FirstContract = ({navigation, route}) => {
                         }}
                     >
                         <Section>
-                            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                    <Text style={{fontSize: 16}}>จำนวนที่เช่า</Text>
-                                    <Text style={{color: "#FF6820"}}> *</Text>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Text style={{ fontSize: 16 }}>จำนวนที่เช่า</Text>
+                                    <Text style={{ color: "#FF6820" }}> *</Text>
                                 </View>
-                                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                    <Text style={{fontSize: 16}}>{totalRent}</Text>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Text style={{ fontSize: 16 }}>{totalRent}</Text>
                                     {save &&
-                                        <Ionicons name="chevron-forward" size={30} color={"#B4B4B4"}/>
+                                        <Ionicons name="chevron-forward" size={30} color={"#B4B4B4"} />
                                     }
                                 </View>
                             </View>
@@ -418,22 +423,22 @@ export const FirstContract = ({navigation, route}) => {
                         onPress={() => setPriceModalVisible(save ? true : false)}
                     >
                         <Section>
-                            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                    <Text style={{fontSize: 16}}>ราคา</Text>
-                                    <Text style={{color: "#FF6820"}}> *ต่อวันต่อชิ้น</Text>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Text style={{ fontSize: 16 }}>ราคา</Text>
+                                    <Text style={{ color: "#FF6820" }}> *ต่อวันต่อชิ้น</Text>
                                 </View>
-                                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                    <Text style={{fontSize: 16}}>{price}</Text>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Text style={{ fontSize: 16 }}>{price}</Text>
                                     {save &&
-                                        <Ionicons name="chevron-forward" size={30} color={"#B4B4B4"}/>
+                                        <Ionicons name="chevron-forward" size={30} color={"#B4B4B4"} />
                                     }
                                 </View>
                             </View>
                         </Section>
                     </TouchableOpacity>
-                    <View style={{flexDirection: 'row', height: 30, alignItems: 'center'}}>
-                        <Text style={{textAlignVertical: 'center'}}>ค่าปรับต่อวันต่อชิ้น</Text>
+                    <View style={{ flexDirection: 'row', height: 30, alignItems: 'center' }}>
+                        <Text style={{ textAlignVertical: 'center' }}>ค่าปรับต่อวันต่อชิ้น</Text>
                     </View>
                     <ContractModal
                         visible={fineLateModalVisible}
@@ -446,15 +451,15 @@ export const FirstContract = ({navigation, route}) => {
                         onPress={() => setFineLateModalVisible(save ? true : false)}
                     >
                         <Section>
-                            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                    <Text style={{fontSize: 16}}>ค่าปรับล่าช้า</Text>
-                                    <Text style={{color: "#FF6820"}}> *</Text>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Text style={{ fontSize: 16 }}>ค่าปรับล่าช้า</Text>
+                                    <Text style={{ color: "#FF6820" }}> *</Text>
                                 </View>
-                                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                    <Text style={{fontSize: 16}}>{fineLate}</Text>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Text style={{ fontSize: 16 }}>{fineLate}</Text>
                                     {save &&
-                                        <Ionicons name="chevron-forward" size={30} color={"#B4B4B4"}/>
+                                        <Ionicons name="chevron-forward" size={30} color={"#B4B4B4"} />
                                     }
                                 </View>
                             </View>
@@ -471,22 +476,22 @@ export const FirstContract = ({navigation, route}) => {
                         onPress={() => setFineBrokenModalVisible(save ? true : false)}
                     >
                         <Section>
-                            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                    <Text style={{fontSize: 16}}>ค่าปรับเสียหาย</Text>
-                                    <Text style={{color: "#FF6820"}}> *</Text>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Text style={{ fontSize: 16 }}>ค่าปรับเสียหาย</Text>
+                                    <Text style={{ color: "#FF6820" }}> *</Text>
                                 </View>
-                                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                    <Text style={{fontSize: 16}}>{fineBroken}</Text>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Text style={{ fontSize: 16 }}>{fineBroken}</Text>
                                     {save &&
-                                        <Ionicons name="chevron-forward" size={30} color={"#B4B4B4"}/>
+                                        <Ionicons name="chevron-forward" size={30} color={"#B4B4B4"} />
                                     }
                                 </View>
                             </View>
                         </Section>
                     </TouchableOpacity>
-                    <View style={{flexDirection: 'row', height: 30, alignItems: 'center'}}>
-                        <Text style={{textAlignVertical: 'center'}}>ระยะเวลา</Text>
+                    <View style={{ flexDirection: 'row', height: 30, alignItems: 'center' }}>
+                        <Text style={{ textAlignVertical: 'center' }}>ระยะเวลา</Text>
                     </View>
                     <ContractModal
                         visible={startDateModalVisible}
@@ -499,25 +504,25 @@ export const FirstContract = ({navigation, route}) => {
                     <TouchableOpacity
                     >
                         <Section>
-                            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                    <Text style={{fontSize: 16}}>วันเริ่มต้น</Text>
-                                    <Text style={{color: "#FF6820"}}> *</Text>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Text style={{ fontSize: 16 }}>วันเริ่มต้น</Text>
+                                    <Text style={{ color: "#FF6820" }}> *</Text>
                                 </View>
-                                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     {!save ?
                                         <Text>{startDate.getDate() + "/" + startDate.getMonth() + "/" + startDate.getFullYear()}</Text>
                                         :
-                                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                             <DateTimePicker
-                                                style={{width: 100}}
+                                                style={{ width: 100 }}
                                                 testID="dateTimePicker"
                                                 value={startDate}
                                                 mode={"date"}
                                                 is24Hour={true}
                                                 onChange={handleStartDate}
                                             />
-                                            <Ionicons name="chevron-forward" size={30} color={"#B4B4B4"}/>
+                                            <Ionicons name="chevron-forward" size={30} color={"#B4B4B4"} />
                                         </View>
                                     }
                                 </View>
@@ -528,25 +533,25 @@ export const FirstContract = ({navigation, route}) => {
 
                     >
                         <Section>
-                            <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-                                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                                    <Text style={{fontSize: 16}}>วันสิ้นสุด</Text>
-                                    <Text style={{color: "#FF6820"}}> *</Text>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                                    <Text style={{ fontSize: 16 }}>วันสิ้นสุด</Text>
+                                    <Text style={{ color: "#FF6820" }}> *</Text>
                                 </View>
-                                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                     {!save ?
                                         <Text>{endDate.getDate() + "/" + endDate.getMonth() + "/" + endDate.getFullYear()}</Text>
                                         :
-                                        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                             <DateTimePicker
-                                                style={{width: 100}}
+                                                style={{ width: 100 }}
                                                 testID="dateTimePicker"
                                                 value={endDate}
                                                 mode={"date"}
                                                 is24Hour={true}
                                                 onChange={handleEndDate}
                                             />
-                                            <Ionicons name="chevron-forward" size={30} color={"#B4B4B4"}/>
+                                            <Ionicons name="chevron-forward" size={30} color={"#B4B4B4"} />
                                         </View>
 
                                     }
@@ -560,7 +565,7 @@ export const FirstContract = ({navigation, route}) => {
             {
                 save ?
                     <View
-                        style={{backgroundColor: 'white', height: 70, justifyContent: 'center', alignItems: 'center'}}>
+                        style={{ backgroundColor: 'white', height: 70, justifyContent: 'center', alignItems: 'center' }}>
                         <TouchableOpacity
                             onPress={() => handleSendContract()}
                         >
@@ -572,7 +577,7 @@ export const FirstContract = ({navigation, route}) => {
                                 alignItems: 'center',
                                 borderRadius: 30
                             }}>
-                                <Text style={{color: 'white', fontSize: 20}}>บันทึกและเสนอ</Text>
+                                <Text style={{ color: 'white', fontSize: 20 }}>บันทึกและเสนอ</Text>
                             </View>
                         </TouchableOpacity>
                     </View>
@@ -595,7 +600,7 @@ export const FirstContract = ({navigation, route}) => {
                                     alignItems: 'center',
                                     borderRadius: 30
                                 }}>
-                                    <Text style={{color: 'white', fontSize: 20}}>เห็นชอบสัญญานี้</Text>
+                                    <Text style={{ color: 'white', fontSize: 20 }}>เห็นชอบสัญญานี้</Text>
                                 </View>
                             </TouchableOpacity>
                         </View>
@@ -618,7 +623,7 @@ export const FirstContract = ({navigation, route}) => {
                                         alignItems: 'center',
                                         borderRadius: 30
                                     }}>
-                                        <Text style={{color: 'white', fontSize: 20}}>พิมพ์</Text>
+                                        <Text style={{ color: 'white', fontSize: 20 }}>พิมพ์</Text>
                                     </View>
                                 </TouchableOpacity>
                             </View>

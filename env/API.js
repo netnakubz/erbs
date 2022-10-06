@@ -30,7 +30,7 @@ axios.interceptors.response.use(
     }
 )
 let API = {
-    domain: "http://172.20.10.3:8080",
+    domain: "http://172.20.10.4:8080",
     config: {
         headers: { Authorization: `Bearer ${AsyncStorage.getItem("token")}` }
     },
@@ -120,7 +120,8 @@ let API = {
                     { Authorization: `Bearer ${token}` }
             }
         )
-        return data.data;
+        const newData = data.data.content.filter((item) => item.equipment.display === true);
+        return newData;
     },
     getPostFindToLend: async (pageNo = 0, pageSize = 10) => {
         let token = await API.getToken("getPostFindTolend");
@@ -162,7 +163,8 @@ let API = {
                 headers:
                     { Authorization: `Bearer ${token}` }
             });
-        return data.data;
+        const newData = data.data.filter((item) => item.display === true);
+        return newData;
     },
     getEquipmentById: async (itemId) => {
         let token = await API.getToken("getEquipmentById");
@@ -228,8 +230,8 @@ let API = {
                 headers:
                     { Authorization: `Bearer ${token}` }
             });
-        console.log(data.data);
-        return data.data;
+        const newData = data.data.filter((item) => item.display === true);
+        return newData;
     },
     updateItem: async (item) => {
         let token = await API.getToken("saveItem");
@@ -400,7 +402,7 @@ let API = {
         return data.data;
     },
     deleteItem: async (itemId) => {
-        let token = await API.getToken("returnItem");
+        let token = await API.getToken("delete");
         const data = await axios.delete(`${API.domain}/api/v1/delete?itemId=${itemId}`, {
             headers:
                 { Authorization: `Bearer ${token}` }

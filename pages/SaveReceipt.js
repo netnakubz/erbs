@@ -64,6 +64,7 @@ export const SaveReceipt = ({ route }) => {
         })
     }
     useEffect(() => {
+        console.log(receipt);
         if (receipt.status === true) {
             updateButtonTopRight();
         } else if (status === "owner")
@@ -132,7 +133,7 @@ export const SaveReceipt = ({ route }) => {
                                 <Text style={{ textAlign: 'center' }}>Name</Text>
                             </View>
                             <View style={{ width: "20%" }}>
-                                <Text style={{ textAlign: 'center' }}>Period</Text>
+                                <Text style={{ textAlign: 'center' }}>Duration</Text>
                             </View>
                             <View style={{ width: "20%" }}>
                                 <Text style={{ textAlign: 'center' }}>Price</Text>
@@ -171,7 +172,7 @@ export const SaveReceipt = ({ route }) => {
                                 <Text style={{
                                     textAlign: 'center',
                                     color: "#464646"
-                                }}>{receipt.contractModel.endDate.split("T")[0].split("-")[2] - receipt.contractModel.startDate.split("T")[0].split("-")[2]}</Text>
+                                }}>{receipt.contractModel.endDate.split("T")[0].split("-")[2] - receipt.contractModel.startDate.split("T")[0].split("-")[2] === 0 ? 1 : receipt.contractModel.endDate.split("T")[0].split("-")[2] - receipt.contractModel.startDate.split("T")[0].split("-")[2]}</Text>
                             </View>
                             <View style={{ width: "20%" }}>
                                 <Text
@@ -187,6 +188,27 @@ export const SaveReceipt = ({ route }) => {
                                     color: "#FF6280",
                                     fontWeight: 'bold',
                                     fontSize: 16
+                                }}>ค่าปรับ</Text>
+                            </View>
+                            <View>
+                                <Text style={{
+                                    color: "#FF6280",
+                                    fontWeight: 'bold',
+                                    fontSize: 16
+                                }}>
+                                    {receipt.fineLate}
+                                </Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={{ marginTop: 10 }}>
+                        <Hr size={42} />
+                        <View style={[styles.row, { justifyContent: "space-between", padding: 10 }]}>
+                            <View>
+                                <Text style={{
+                                    color: "#FF6280",
+                                    fontWeight: 'bold',
+                                    fontSize: 16
                                 }}>Total</Text>
                             </View>
                             <View>
@@ -195,7 +217,7 @@ export const SaveReceipt = ({ route }) => {
                                     fontWeight: 'bold',
                                     fontSize: 16
                                 }}>
-                                    {parseInt(receipt.contractModel.price) * (parseInt(receipt.contractModel.totalRent) === 0 ? 1 : receipt.contractModel.totalRent)}
+                                    {parseInt(receipt.contractModel.price) * receipt.contractModel.totalRent * receipt.fineLate === 0 ? receipt.contractModel.totalRent : parseInt(receipt.contractModel.price) * receipt.contractModel.totalRent * receipt.fineLate}
                                 </Text>
                             </View>
                         </View>

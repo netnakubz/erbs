@@ -90,7 +90,7 @@ export const FindToBorrowPage = ({ content, setContent, isHomePage, setHomePage 
                     ref={flatListRef}
                     showsVerticalScrollIndicator={false}
                     nestedScrollEnabled={true}
-                    data={post.content.filter(e => {
+                    data={post.filter(e => {
                         if (content !== "All" && selectedType !== "ทั้งหมด") {
                             return e.equipment.suggestion.some(
                                 sug => sug.content === content

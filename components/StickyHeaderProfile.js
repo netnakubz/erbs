@@ -20,7 +20,7 @@ export default function App(props) {
     const [receipt, setReceipt] = useState([]);
     const [myRenting, setMyRenting] = useState([]);
     const [toPay, setToPay] = useState(0);
-    const [newItem,setNewItem] = useState([]);
+    const [newItem, setNewItem] = useState([]);
     const hadleShowPage = (page) => {
         setShowPage(page);
     }
@@ -46,9 +46,6 @@ export default function App(props) {
         getMyRenting();
     }, []);
     useEffect(() => {
-        console.log("right here");
-        const newArr = items.filter((item) => (item.equipmentModel.display === true))
-        setNewItem(newArr);
     }, [])
     return (
         <StickyHeaderScrollView
@@ -111,7 +108,7 @@ export default function App(props) {
                 <View style={[styles.row]}>
                     {
                         showPage === "myItems" &&
-                        newItem.map((item) => {
+                        items.map((item) => {
                             return <TouchableOpacity
                                 onPress={() => {
                                     showItem(item.itemId)

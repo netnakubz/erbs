@@ -40,7 +40,20 @@ export const UpdateItem = ({ navigation, route }) => {
         images.splice(index, 1);
         setImages(prev => [...prev]);
     }
-
+    const handleDelete = async () => {
+        const data = await API.deleteItem(itemId);
+    }
+    useEffect(() => {
+        navigation.setOptions({
+            headerRight: () => {
+                return (
+                    <TouchableOpacity onPress={()=>handleDelete()}>
+                        <Text>ลบ</Text>
+                    </TouchableOpacity>
+                )
+            }
+        })
+    }, []);
     const handleSaveBtn = () => {
         API.updateItem({
             totalRent: parseInt(itemSettings.quantity),
@@ -118,9 +131,8 @@ export const UpdateItem = ({ navigation, route }) => {
         const data = await API.getItemType();
         setItemType(data);
     }
-    const deleteItem =async(itemId)=>{
+    const deleteItem = async () => {
         const data = await API.deleteItem(itemId);
-        
     }
     useEffect(() => {
         getItemType();

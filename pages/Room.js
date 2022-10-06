@@ -50,7 +50,6 @@ export default function Room({ navigation }) {
                 return;
             }
             token = (await Notifications.getExpoPushTokenAsync()).data;
-            console.log(token);
         } else {
             alert('Must use physical device for Push Notifications');
         }
@@ -58,7 +57,6 @@ export default function Room({ navigation }) {
         return token;
     }
     async function schedulePushNotification(message) {
-        console.log(message);
         let string = JSON.parse(message.body);
         await Notifications.scheduleNotificationAsync({
             content: {
@@ -76,7 +74,6 @@ export default function Room({ navigation }) {
         });
 
         responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-            console.log(response);
         });
 
         return () => {
