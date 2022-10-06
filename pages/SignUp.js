@@ -9,7 +9,7 @@ import API from "../env/API";
 import { useNavigation } from "@react-navigation/native";
 import { v4 as uuidv4 } from "uuid";
 const InputField = (props) => {
-    const { value, onChange, type = "default", name, placeholder } = props;
+    const { value, onChange, type = "default", name, placeholder, minLength,maxLength } = props;
     return (
         <Section marginTop={1}>
             <View style={[styles.row]}>
@@ -19,6 +19,8 @@ const InputField = (props) => {
                 </View>
                 <View style={{ width: "100%", height: '100%' }}>
                     <TextInput
+                        minLength={minLength}
+                        maxLength={maxLength}
                         placeholder={placeholder}
                         placeholderTextColor={"grey"}
                         value={value}
@@ -32,6 +34,7 @@ const InputField = (props) => {
 }
 
 export const SignUp = ({ route }) => {
+    const { ready } = route.params;
     const navigation = useNavigation();
     const [isReady, setIsReady] = useState(false);
     const [firstName, setFirstName] = useState("");
@@ -89,6 +92,7 @@ export const SignUp = ({ route }) => {
             }
         }
         await API.addOrUpdateUser(user);
+        ready(true);
         navigation.navigate("BottomNav");
     }
     useEffect(() => {
@@ -128,6 +132,8 @@ export const SignUp = ({ route }) => {
                             onChange={handleIdNumber}
                             name="บัตรประชาชน"
                             type="number-pad"
+                            minLength={13}
+                            maxLength={13}
                             placeholder={"บัตรประชาชน"}
                         />
                         <InputField
@@ -154,6 +160,8 @@ export const SignUp = ({ route }) => {
                             onChange={handlePhoneNumber}
                             type="phone-pad"
                             name="เบอร์โทรศัพท์"
+                            minLength={10}
+                            maxLength={10}
                             placeholder="080-000-0000"
                         />
                         <Text>ที่อยู่ตามบัตรประชาชน</Text>

@@ -364,7 +364,7 @@ export const FirstContract = ({navigation, route}) => {
                             totalItem={equipment.quantity}
                         />
                     }
-                    <TouchableOpacity
+                    {/* <TouchableOpacity
                         onPress={() =>{
                             if(!save)
                                 return;
@@ -386,8 +386,8 @@ export const FirstContract = ({navigation, route}) => {
                                 </View>
                             </View>
                         </Section>
-                    </TouchableOpacity>
-                    {/*<TouchableOpacity
+                    </TouchableOpacity> */}
+                    <TouchableOpacity
                         onPress={() => {
                             setTotalRentModalVisible(save ? true : false);
                         }}
@@ -406,7 +406,7 @@ export const FirstContract = ({navigation, route}) => {
                                 </View>
                             </View>
                         </Section>
-                    </TouchableOpacity>*/}
+                    </TouchableOpacity>
                     <ContractModal
                         visible={priceModalVisible}
                         setVisible={setPriceModalVisible}

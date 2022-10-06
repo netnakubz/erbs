@@ -1,27 +1,26 @@
-import React, {useState, useEffect, useLayoutEffect} from 'react';
-import {StyleSheet, Text, TouchableOpacity, View, Image, FlatList} from 'react-native';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View, Image, FlatList } from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
-import {Button, Card} from "react-native-elements"
-import {StickyHeaderScrollView} from 'react-native-simple-sticky-header';
-import {Profile} from './Profile';
+import { Button, Card } from "react-native-elements"
+import { StickyHeaderScrollView } from 'react-native-simple-sticky-header';
+import { Profile } from './Profile';
 import DATA from './data';
 import Hr from './Hr';
 import API from '../env/API';
-import {Section} from './Section';
-import {ListReceipt} from './ListReceipt';
-import {useNavigation} from '@react-navigation/native';
+import { Section } from './Section';
+import { ListReceipt } from './ListReceipt';
+import { useNavigation } from '@react-navigation/native';
 
 export default function App(props) {
     const navigation = useNavigation();
-    const {setIsReady, isReady} = props;
-
-    const {items, setIsRefresh} = props;
+    const { items, setIsRefresh, setIsReady, isReady } = props;
     const itemHeight = 200 * (items.length / 3);
     const [showPage, setShowPage] = useState("myItems");
     const [isOwnerProfile, setIsOwnerProfile] = useState(true);
     const [receipt, setReceipt] = useState([]);
     const [myRenting, setMyRenting] = useState([]);
     const [toPay, setToPay] = useState(0);
+    const [newItem,setNewItem] = useState([]);
     const hadleShowPage = (page) => {
         setShowPage(page);
     }
@@ -40,13 +39,17 @@ export default function App(props) {
         setMyRenting(temp);
     }
     const showItem = (itemId) => {
-        API.deleteItem(itemId);
+        navigation.navigate("updateItem", { itemId: itemId });
     }
     useEffect(() => {
         getReceipt();
         getMyRenting();
     }, []);
-
+    useEffect(() => {
+        console.log("right here");
+        const newArr = items.filter((item) => (item.equipmentModel.display === true))
+        setNewItem(newArr);
+    }, [])
     return (
         <StickyHeaderScrollView
             onRefresh={() => {
@@ -68,7 +71,7 @@ export default function App(props) {
                         }}
                     >
                         <Profile isOwnerProfile={isOwnerProfile} items={items} receipts={receipt}
-                                 setIsReady={setIsReady} isReady={isReady} toPay={toPay}/>
+                            setIsReady={setIsReady} isReady={isReady} toPay={toPay} />
                     </View>
                 </View>
             )}
@@ -86,17 +89,17 @@ export default function App(props) {
                     <TouchableOpacity
                         onPress={() => hadleShowPage("myItems")}
                     >
-                        <Feather size={25} name="grid"/>
+                        <Feather size={25} name="grid" />
                     </TouchableOpacity>
                     <TouchableOpacity
                         onPress={() => hadleShowPage("receipt")}
                     >
-                        <Feather size={25} name="file-text"/>
+                        <Feather size={25} name="file-text" />
                     </TouchableOpacity>
                     <TouchableOpacity
                         onPress={() => hadleShowPage("renting")}
                     >
-                        <Feather size={25} name="dollar-sign"/>
+                        <Feather size={25} name="dollar-sign" />
                     </TouchableOpacity>
                 </ View>
             )}
@@ -104,32 +107,32 @@ export default function App(props) {
             bottomHeight={180}
             scrollViewBackground={'#f7f7f7'}
         >
-            <View style={[styles.container, {top: isOwnerProfile ? -65 : -10, height: "10%"}]}>
+            <View style={[styles.container, { top: isOwnerProfile ? -65 : -10, height: "10%" }]}>
                 <View style={[styles.row]}>
                     {
                         showPage === "myItems" &&
-
-                        items.map((item) => (
-                            <TouchableOpacity
+                        newItem.map((item) => {
+                            return <TouchableOpacity
                                 onPress={() => {
                                     showItem(item.itemId)
                                 }}
                                 style={[styles.col]} key={item.itemId}
                             >
                                 <Image
-                                    style={{width: "100%", height: "100%"}}
+                                    style={{ width: "100%", height: "100%" }}
                                     resizeMode='cover'
                                     source={{
                                         uri: `${API.domain}/files/${item?.itemImg[0]?.location}`
                                     }}
                                 />
                             </TouchableOpacity>
-                        )) ||
+                        }
+                        ) ||
                         showPage === "receipt" &&
-                        <ListReceipt receipt={receipt} status={"owner"}/>
+                        <ListReceipt receipt={receipt} status={"owner"} />
                         ||
                         showPage === "renting" &&
-                        <ListReceipt receipt={myRenting} status={"borrower"}/>
+                        <ListReceipt receipt={myRenting} status={"borrower"} />
                     }
                 </View>
             </View>

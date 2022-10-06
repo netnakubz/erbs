@@ -1,9 +1,36 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import React, { useState, useEffect } from "react";
-import { Keyboard, View, Text, StyleSheet, Image, TouchableOpacity, TextInput, TouchableWithoutFeedback } from "react-native";
+import { Keyboard, View, Text, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView, TouchableWithoutFeedback, KeyboardAvoidingView, Alert } from "react-native";
 import { DismissKeyboard } from "../components/DismissKeybord";
+import ModalSelector from 'react-native-modal-selector';
+import { Section } from '../components/Section';
 import * as ImagePicker from 'expo-image-picker'
-
+import API from '../env/API';
+import { v4 as uuidv4 } from "uuid";
+const InputField = (props) => {
+    const { value, onChange, type = "default", name, placeholder, minLength, maxLength } = props;
+    return (
+        <Section marginTop={1}>
+            <View style={[styles.row]}>
+                <View style={[styles.row, { width: "35%" }]}>
+                    <Text>{name}</Text>
+                    <Text style={{ color: "#FF6280" }}> *</Text>
+                </View>
+                <View style={{ width: "100%", height: '100%' }}>
+                    <TextInput
+                        minLength={minLength}
+                        maxLength={maxLength}
+                        placeholder={placeholder}
+                        placeholderTextColor={"grey"}
+                        value={value}
+                        keyboardType={type}
+                        onChangeText={(e) => onChange(e)}
+                    />
+                </View>
+            </View>
+        </Section>
+    );
+}
 export const EditUserProfile = ({ navigation, route }) => {
     const { name, userId } = route.params;
     const { user } = route.params;
@@ -31,82 +58,219 @@ export const EditUserProfile = ({ navigation, route }) => {
             title: "แก้ไขข้อมูลส่วนตัว"
         })
     }, []);
+    const [isReady, setIsReady] = useState(false);
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [email, setEmail] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
+    const [idNumber, setIdNumber] = useState("");
+    const [postCode, setPostCode] = useState("");
+    const [road, setRoad] = useState("");
+    const [provinces, setProvinces] = useState([]);
+    const [districts, setDistricts] = useState([]);
+    const [province, setProvince] = useState("");
+    const [district, setDistrict] = useState("");
+    const handleFirstName = (e) => {
+        setFirstName(e);
+    }
+    const handleLastName = (e) => {
+        setLastName(e);
+    }
+    const handleEmail = (e) => {
+        setEmail(e);
+    }
+    const handlePhoneNumber = (e) => {
+        setPhoneNumber(e);
+    }
+    const handleIdNumber = (e) => {
+        setIdNumber(e);
+    }
+    const handlePostCode = (e) => {
+        setPostCode(e);
+    }
+    const handleRoad = (e) => {
+        setRoad(e);
+    }
+    const handleProvince = async (e) => {
+        setDistricts([]);
+        setProvince(e.province);
+        await getDistrict();
+    }
+    const handleDistrict = (e) => {
+        setDistrict(e);
+    }
+    const getProvinces = async () => {
+        const data = await API.getProvice();
+        setProvinces(data.data);
+    }
+    const getDistrict = async () => {
+        const data = await API.getDistrict(province);
+        setDistricts(data.data);
+    }
+    useEffect(() => {
+        getProvinces();
+    }, []);
+    const updateInfo = async () => {
+        const user = {
+            "email": email,
+            "name": firstName,
+            "surname": lastName,
+            "tel": phoneNumber,
+            "idNumber": idNumber,
+            "homeAddressModel": {
+                "district": district,
+                "postCode": postCode,
+                "road": road,
+                "province": province
+            }
+        }
+        await API.addOrUpdateUser(user).then(()=>Alert.alert("บันทึกข้อมูลแล้ว"));
+    }
+    const getMyProfile = async () => {
+        const data = await API.getUserProfile();
+        if (data) {
+            console.log(data);
+            setIdNumber(data.idNumber);
+            setFirstName(data.name);
+            setLastName(data.surname);
+            setEmail(data.email);
+            setPhoneNumber(data.tel);
+            setProvince(data.homeAddressModel.province);
+            setDistrict(data.homeAddressModel.district);
+            setRoad(data.homeAddressModel.road);
+            setPostCode(data.homeAddressModel.postCode)
+        }
+    }
+    useEffect(() => {
+        getMyProfile()
+    }, [])
     return (
-        <DismissKeyboard>
-            <View style={styles.container}>
-                <View style={[styles.userImgView, styles.row]}>
-                    <View>
-                        <Image
-                            style={styles.userImg}
-                            source={{ uri: "https://i.pinimg.com/736x/b1/16/0f/b1160fdd10b71b095c19366845fd6b3e.jpg" }}
+        <KeyboardAvoidingView style={{
+            flex: 1,
+            flexDirection: 'column',
+            justifyContent: 'center',
+        }}
+            behavior="padding" enabled keyboardVerticalOffset={10}
+        >
+            <ScrollView style={{ marginBottom: 80}}>
+                <DismissKeyboard>
+                    <View style={{ height: "100%" }}>
+                        <View style={{ marginTop: 30 }}>
+                            <Text>กรอกข้อมูลเพื่อลงชื่อเข้าใจงาน</Text>
+                        </View>
+                        <InputField
+                            value={idNumber}
+                            onChange={handleIdNumber}
+                            name="บัตรประชาชน"
+                            type="number-pad"
+                            minLength={13}
+                            maxLength={13}
+                            placeholder={"บัตรประชาชน"}
                         />
-                    </View>
-                    <View>
-                        <View>
-                            <Text
-                                style={styles.titleName}
-                            >{user.name}</Text>
-                        </View>
-                        <View>
-                            <TouchableOpacity
-                                onPress={() => pickImage()}
-                            >
-                                <Text style={{ color: '#FF6280' }}>เปลี่ยนรุปโปรไฟล์</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
-                </View>
-                <View>
-                    <View style={[styles.row, styles.inputInfo]}>
-                        <View>
-                            <Text>
-                                Email
-                            </Text>
-                        </View>
-                        <View>
-                            <Text>
-                                {user.email}
-                            </Text>
-                        </View>
-                    </View>
-                    <View style={[styles.row, styles.inputInfo]}>
-                        <View>
-                            <Text>
-                                Tel
-                            </Text>
-                        </View>
-                        <View
-                            style={{
-                                position: 'absolute',
-                                right: 30,
-                                width: 1000
-                            }}
-                        >
-                            <TextInput
-                                style={styles.input}
-                                value={tel}
-                                maxLength={10}
-                                keyboardType="numeric"
-                                textAlign="right"
+                        <InputField
+                            value={firstName}
+                            onChange={handleFirstName}
+                            name="ชื่อจริง"
+                            placeholder={"กรอกชื่อจริง"}
+                        />
+                        <InputField
+                            value={lastName}
+                            onChange={handleLastName}
+                            name="นามสกุล"
+                            placeholder="กรอกนามสกุล"
+                        />
+                        <InputField
+                            value={email}
+                            onChange={handleEmail}
+                            type="email-address"
+                            name="อีเมล"
+                            placeholder="อีเมล"
+                        />
+                        <InputField
+                            value={phoneNumber}
+                            onChange={handlePhoneNumber}
+                            type="phone-pad"
+                            name="เบอร์โทรศัพท์"
+                            minLength={10}
+                            maxLength={10}
+                            placeholder="080-000-0000"
+                        />
+                        <Text>ที่อยู่ตามบัตรประชาชน</Text>
 
-                                onChange={(e) => {
-                                    setTel(e);
-                                }}
+                        <ModalSelector
+                            onChange={(selector) => {
+                                handleProvince(selector)
+                            }}
+                            ref={selector => { selector = selector; }}
+                            data={provinces}
+                            keyExtractor={item => uuidv4()}
+                            labelExtractor={item => item.province}
+                        >
+                            <InputField
+                                value={province}
+                                onChange={handleProvince}
+                                name="จังหวัด"
+                                placeholder="จังหวัด"
                             />
-                        </View>
-                        <Ionicons name="chevron-forward" size={20} />
+                        </ModalSelector>
+                        <ModalSelector
+                            onChange={(selector) => {
+                                handleDistrict(selector)
+                            }}
+                            ref={selector => { selector = selector; }}
+                            data={districts}
+                            keyExtractor={item => uuidv4()}
+                            labelExtractor={item => item}
+                        >
+                            <InputField
+                                value={district}
+                                onChange={handleDistrict}
+                                name="อำเภอ/แขวง"
+                                placeholder="อำเภอ"
+                            />
+                        </ModalSelector>
+                        <InputField
+                            value={road}
+                            onChange={handleRoad}
+                            name="ถนน"
+                            placeholder="ปุณณกัณฑ์"
+                        />
+                        <InputField
+                            value={postCode}
+                            onChange={handlePostCode}
+                            type="number-pad"
+                            name="รหัสไปรษณีย์"
+                            placeholder="80000"
+                        />
+
                     </View>
-                </View>
-                <View style={[styles.saveBtn, styles.row]}>
-                    <TouchableOpacity
-                        style={styles.btnStyle}
-                        onPress={() => handleSaveBtn()}
-                    >
-                        <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>บันทึก</Text>
-                    </TouchableOpacity>
-                </View>
+                </DismissKeyboard>
+            </ScrollView >
+            <View style={{
+                backgroundColor: 'white',
+                height: 70,
+                justifyContent: 'center',
+                alignItems: 'center',
+                position: "absolute",
+                bottom: 0,
+                width: "100%"
+            }}>
+                <TouchableOpacity
+                    onPress={() => updateInfo()}
+                >
+                    <View style={{
+                        backgroundColor: "#FF6280",
+                        width: 300,
+                        height: 50,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        borderRadius: 30
+                    }}>
+                        <Text style={{ color: 'white', fontSize: 20 }}>ยืนยัน</Text>
+                    </View>
+                </TouchableOpacity>
             </View>
-        </DismissKeyboard>
+        </KeyboardAvoidingView>
     );
 }
 

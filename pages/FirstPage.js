@@ -29,7 +29,8 @@ export const FirstPage = ({ route, navigation }) => {
                 const isExist = await API.auth();
                 if (!isExist) {
                     navigation.navigate("SignUp", {
-                        userInfo: result.user
+                        userInfo: result.user,
+                        ready:(e)=>ready(e)
                     });
                 } else {
                     ready(true)

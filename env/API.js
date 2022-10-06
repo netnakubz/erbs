@@ -14,7 +14,7 @@ axios.interceptors.response.use(
         console.log(error.response.status)
         const originalConfig = error.config;
         if (error.response) {
-            if (error.response.status === 401 ) {
+            if (error.response.status === 401) {
                 originalConfig._retry = true;
                 // Do something, call refreshToken() request for example;
                 // return a request
@@ -22,14 +22,15 @@ axios.interceptors.response.use(
                 const refreshToken = await AsyncStorage.getItem("refreshToken");
                 let authState = await AppAuth.refreshAsync(config, refreshToken);
                 AsyncStorage.setItem("token", authState.idToken);
-                return axios.request(originalConfig);
+                error.config.headers['Authorization'] = 'Bearer ' + authState.idToken;
+                return axios.request(error.config);
             }
         }
         return Promise.reject(error);
     }
 )
 let API = {
-    domain: "http://172.20.10.4:8080",
+    domain: "http://172.20.10.3:8080",
     config: {
         headers: { Authorization: `Bearer ${AsyncStorage.getItem("token")}` }
     },
@@ -212,13 +213,13 @@ let API = {
             });
         return data.data;
     },
-    getItemSerial:async(itemId)=>{
-      let token = await API.getToken("getItemSerial");
-      const data = await axios.get(`${API.domain}/api/v1/get/itemSerial?itemId=${itemId}`,{
-          headers:
-              { Authorization: `Bearer ${token}` }
-      });
-      return data.data;
+    getItemSerial: async (itemId) => {
+        let token = await API.getToken("getItemSerial");
+        const data = await axios.get(`${API.domain}/api/v1/get/itemSerial?itemId=${itemId}`, {
+            headers:
+                { Authorization: `Bearer ${token}` }
+        });
+        return data.data;
     },
     getMyItems: async () => {
         let token = await API.getToken("getMyItems");
@@ -227,6 +228,15 @@ let API = {
                 headers:
                     { Authorization: `Bearer ${token}` }
             });
+        console.log(data.data);
+        return data.data;
+    },
+    updateItem: async (item) => {
+        let token = await API.getToken("saveItem");
+        const data = await axios.post(`${API.domain}/api/v1/update/item`, { name: item.name, itemId: item.itemId }, {
+            headers:
+                { Authorization: `Bearer ${token}` }
+        });
         return data.data;
     },
     saveItem: async (images = [], item) => {
@@ -252,6 +262,7 @@ let API = {
         item.serials.forEach(serial => {
             formData.append("serials", serial);
         });
+        formData.append("itemId", item.itemId ? item.itemId : 0);
         axios.post(
             `${API.domain}/api/v1/uploadEquipment`,
             formData,
@@ -380,14 +391,23 @@ let API = {
         });
         return data.data;
     },
-    deleteItem:async(itemId)=>{
-        let token = await API.getToken("search");
-        const data = await axios.delete(`${API.domain}/api/v1/delete/item?itemId=${itemId}`,
-            {
-                headers:
-                    { Authorization: `Bearer ${token}` }
-            });
+    returnItem: async (itemId) => {
+        let token = await API.getToken("returnItem");
+        const data = await axios.get(`${API.domain}/api/v1/return?receiptId=${itemId}`, {
+            headers:
+                { Authorization: `Bearer ${token}` }
+        });
+        return data.data;
+    },
+    deleteItem: async (itemId) => {
+        let token = await API.getToken("returnItem");
+        const data = await axios.delete(`${API.domain}/api/v1/delete?itemId=${itemId}`, {
+            headers:
+                { Authorization: `Bearer ${token}` }
+        }
+        )
     }
+
 
 };
 export default API;

@@ -20,7 +20,7 @@ import { Button } from 'react-native-elements';
 export const Profile = ({ isOwnerProfile, items, receipts, setIsReady, isReady,toPay }) => {
     const navigation = useNavigation();
     const [isLogout, setIsLogout] = useState(false);
-
+    const [newItem,setNewItem] = useState([]);
     const [profile, setProfile] = useState({
         userId: 10001,
         firstName: "สมชาย",
@@ -46,6 +46,10 @@ export const Profile = ({ isOwnerProfile, items, receipts, setIsReady, isReady,t
     useLayoutEffect(() => {
 
     })
+    useEffect(()=>{
+        const newArr = items.filter((item) => (item.equipmentModel))
+        setNewItem(newArr);
+    },[]);
     const getMyProfile = async () => {
         const data = await API.getUserProfile();
         navigation.setOptions({
@@ -76,7 +80,7 @@ export const Profile = ({ isOwnerProfile, items, receipts, setIsReady, isReady,t
                 <View style={{ flexDirection: 'column', width: "70%" }}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-evenly' }}>
                         <View style={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                            <Text>{items.length}</Text>
+                            <Text>{newItem.length}</Text>
                             <Text>สินค้า</Text>
                         </View>
                         {isOwnerProfile &&

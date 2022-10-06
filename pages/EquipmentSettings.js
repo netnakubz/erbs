@@ -8,6 +8,7 @@ import { Input } from "react-native-elements";
 export const EquipmentSettings = ({ navigation }) => {
     const [countItem, setCountItem] = useState(1);
     const [objects, setObjects] = useState([]);
+    const [price,setPrice] = useState(0);
     const scrollViewRef = useRef();
     const handleSaveBtn = () => {
         let serials = [];
@@ -15,7 +16,7 @@ export const EquipmentSettings = ({ navigation }) => {
         objects.forEach(o => serials.push(o.serial));
         let object = {
             quantity: countItem,
-            price: objects[0].price,
+            price: price,
             serials: serials
         }
         DeviceEventEmitter.emit("itemSettings", object);
@@ -43,10 +44,8 @@ export const EquipmentSettings = ({ navigation }) => {
         tempObjects[findIndexByKey(id)].serial = e;
         setObjects(tempObjects);
     }
-    const handlePriceChange = (id, e) => {
-        let tempObjects = objects;
-        tempObjects[findIndexByKey(id)].price = e;
-        setObjects(tempObjects);
+    const handlePriceChange = (e) => {
+        setPrice(e);
     }
     useEffect(() => {
         setObjects(prev => [...prev, { id: getKey(), serial: "", price: 0 }]);
@@ -74,13 +73,34 @@ export const EquipmentSettings = ({ navigation }) => {
                             </View>
                         </View>
                     </Section>
+                    <Section marginTop={10}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <View >
+                                <Text>ราคาต่อวัน</Text>
+                            </View>
+                            <View >
+
+                                <Input
+                                    onChangeText={(e) => handlePriceChange(e)}
+                                    placeholder="20"
+                                    keyboardType="numeric"
+                                    containerStyle={{
+                                        width: 120
+                                    }}
+                                    inputContainerStyle={{
+                                        borderWidth: 1,
+                                        borderRadius: 20,
+                                    }}
+                                    textAlign="center"
+                                />
+                            </View>
+                        </View>
+                    </Section>
                     <View style={[styles.row, { justifyContent: 'space-between' }]}>
                         <View style={{ flex: 0.6, marginTop: 40, marginLeft: 30 }}>
                             <Text>Serial Number</Text>
                         </View>
-                        <View style={{ flex: 0.4, marginTop: 40 }}>
-                            <Text>ราคาต่อวัน</Text>
-                        </View>
+
                     </View>
                     {
                         countItem && objects.map((el, i) => (
@@ -95,21 +115,7 @@ export const EquipmentSettings = ({ navigation }) => {
                                             }}
                                         />
                                     </View>
-                                    <View style={{ flex: 0.4, marginTop: 10 }}>
-                                        <Input
-                                            onChangeText={(e) => handlePriceChange(el.id, e)}
-                                            placeholder="20"
-                                            keyboardType="numeric"
-                                            containerStyle={{
-                                                width: 120
-                                            }}
-                                            inputContainerStyle={{
-                                                borderWidth: 1,
-                                                borderRadius: 20,
-                                            }}
-                                            textAlign="center"
-                                        />
-                                    </View>
+
                                     <View>
                                         <TouchableOpacity
                                             onPress={() => handlePressDelete(el.id)}
